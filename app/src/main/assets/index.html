@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' wss://ws.bitstamp.net; base-uri 'none'; frame-src 'none'; object-src 'none'">
+  <title>TradingViewBTC</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brand">
+        <span class="bitcoin" aria-hidden="true">₿</span>
+        <div><h1>BTC<span>/</span>USD</h1><span class="exchange">BITSTAMP</span></div>
+      </div>
+      <div class="quote"><strong id="price">—</strong><span id="change">—</span></div>
+      <button id="refresh" class="icon" type="button" aria-label="Refresh prices" title="Refresh prices">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.2 6.1M20 6v5h-5"/></svg>
+      </button>
+    </header>
+
+    <nav class="toolbar" aria-label="Chart controls">
+      <div class="intervals" id="quick-intervals" aria-label="Common intervals">
+        <button type="button" data-interval="1h">1H</button>
+        <button type="button" data-interval="4h">4H</button>
+        <button type="button" data-interval="1D" aria-pressed="true">1D</button>
+        <button type="button" data-interval="1W">1W</button>
+        <button type="button" data-interval="1M">1M</button>
+      </div>
+      <button id="interval-menu" class="icon menu" aria-haspopup="dialog" aria-label="All intervals" title="All intervals">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+      </button>
+      <button id="layers" class="with-icon" type="button" aria-haspopup="dialog" aria-label="Overlay settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4 8 4-8 4-8-4zm-8 8 8 4 8-4m-16 4 8 4 8-4"/></svg>
+        <span>Overlays</span>
+      </button>
+    </nav>
+
+    <section class="panel" aria-label="Bitcoin chart">
+      <div class="panel-head">
+        <div class="script"><span class="script-dot"></span><h2>My Super Script</h2><span id="active-interval">1D</span></div>
+        <div class="panel-options">
+          <div id="mode-badge" hidden></div>
+          <button id="auto-scale" type="button" aria-pressed="true">Auto scale</button>
+        </div>
+      </div>
+      <div id="ohlc" class="ohlc" aria-label="Selected candle prices">
+        <span id="selected-time"></span>
+        <span>O <b id="open">—</b></span><span>H <b id="high">—</b></span>
+        <span>L <b id="low">—</b></span><span>C <b id="close">—</b></span>
+      </div>
+      <div class="chart" id="chart">
+        <canvas id="plot" tabindex="0" aria-label="Bitcoin price and overlay chart. Drag or pinch horizontally, vertically or diagonally. Tap to inspect candles. Arrow keys pan and plus and minus zoom."></canvas>
+        <div class="empty" id="empty" role="status">
+          <strong id="empty-title">Loading Bitstamp BTC/USD</strong>
+          <div id="empty-detail">Fetching recent candles</div>
+          <div class="empty-actions" id="empty-actions" hidden>
+            <button id="retry" type="button">Retry</button><button id="sample" type="button">View demo</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <div id="ranges" class="ranges" aria-label="Visible chart range"></div>
+        <div class="scale">
+          <button id="fit" type="button" aria-pressed="false" title="Include all overlays in price scale">All plots</button>
+          <button id="log" type="button" aria-pressed="false" title="Logarithmic price scale">Log</button>
+          <button id="latest" type="button" title="Jump to latest candle">Latest</button>
+        </div>
+      </div>
+    </section>
+    <footer class="status">
+      <button id="feed-button" type="button" aria-haspopup="dialog" title="Data sources and status">
+        <span id="status-dot" class="status-dot"></span><span id="market-state" aria-live="polite">Connecting to Bitstamp</span>
+      </button>
+      <span class="timezone">UTC · USD</span>
+    </footer>
+  </main>
+
+  <dialog id="interval-dialog">
+    <div class="dialog-heading"><h2>Chart interval</h2><button class="dismiss" aria-label="Close interval picker">×</button></div>
+    <div id="interval-grid" class="interval-grid"></div>
+  </dialog>
+
+  <dialog id="layers-dialog">
+    <div class="dialog-heading"><h2>Overlays</h2><button class="dismiss" aria-label="Close overlay settings">×</button></div>
+    <div id="layer-list" class="layer-list"></div>
+    <div class="layer-settings">
+      <label><span>End labels</span><input id="end-labels" type="checkbox" checked></label>
+      <label><span>Log-channel projections</span><input id="projections" type="checkbox" checked></label>
+    </div>
+  </dialog>
+
+  <dialog id="feed-dialog">
+    <div class="dialog-heading"><h2>Data sources</h2><button class="dismiss" aria-label="Close data sources">×</button></div>
+    <dl id="feed-list"></dl>
+    <button class="dialog-action" id="demo-toggle" type="button">View demo chart</button>
+  </dialog>
+</body>
+</html>

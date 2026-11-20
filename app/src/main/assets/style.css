@@ -1,0 +1,121 @@
+:root {
+  color-scheme: dark;
+  --surface:#0d1117; --panel:#131822; --border:#292f3c; --grid:#272f3c;
+  --text:#eef1f6; --muted:#99a4b6; --accent:#c4f36e; --quiet:#1d2630;
+  font-family: system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--surface); color:var(--text);
+}
+* { box-sizing:border-box }
+[hidden] { display:none !important }
+body { margin:0; overflow:hidden }
+button { font:inherit; color:inherit; cursor:pointer; background:none; border:0; padding:0; -webkit-tap-highlight-color:transparent }
+button:focus-visible, input:focus-visible, canvas:focus-visible { outline:1px solid var(--accent); outline-offset:-2px }
+svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
+.shell { max-width:1440px; margin:auto; height:100vh; height:100dvh; min-height:260px; padding:0 clamp(12px,2.5vw,38px); display:flex; flex-direction:column }
+.top { display:flex; align-items:center; min-height:71px; gap:15px; border-bottom:1px solid var(--border) }
+.brand { display:flex; gap:12px; align-items:center; margin-right:auto }
+.bitcoin { display:grid; place-items:center; border-radius:13px; width:42px; height:42px; background:#302513; color:#ffad43; border:1px solid #4f391c; font-size:27px; font-weight:650 }
+h1,h2,p { margin:0 }
+h1 { font-size:19px; line-height:1.1; letter-spacing:.02em }
+h1 span { color:#737f91; margin:0 1px }
+.exchange { color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.135em }
+.quote { display:grid; justify-items:end; font-variant-numeric:tabular-nums; line-height:1.15; gap:5px }
+.quote strong { font-size:24px; font-weight:645; letter-spacing:-.045em; white-space:nowrap }
+.quote span { font-size:11px; color:var(--muted); font-family:ui-monospace,monospace }
+.quote .up { color:#58cfb7 }
+.quote .down { color:#ff7b81 }
+.icon { width:38px; height:40px; color:var(--muted); display:grid; place-items:center; flex:none; border-radius:7px }
+button:hover { color:var(--text); background:#ffffff0c }
+.toolbar { min-height:57px; display:flex; align-items:center; gap:6px }
+.intervals { display:flex; gap:3px; align-items:center }
+.intervals button,.interval-grid button { color:var(--muted); font-family:ui-monospace,monospace; font-weight:700; font-size:13px; min-width:42px; min-height:38px; border-radius:6px }
+button[aria-pressed="true"] { color:var(--accent); background:#b2f15813 }
+.menu { border-left:1px solid var(--border); border-radius:0 6px 6px 0; margin-right:auto }
+.with-icon { height:38px; display:flex; align-items:center; gap:7px; color:var(--text); border:1px solid var(--border); padding:0 10px; border-radius:7px; font-size:12px }
+.with-icon svg { color:var(--accent) }
+.panel { min-height:0; flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--panel); border:1px solid var(--border); border-radius:11px }
+.panel-head { display:flex; min-height:40px; justify-content:space-between; align-items:center; padding:0 12px }
+.script { display:flex; align-items:center; gap:8px; min-width:0 }
+.script h2 { font-size:13px; font-weight:650; white-space:nowrap }
+.script-dot { width:6px; height:6px; border-radius:50%; background:var(--accent) }
+#active-interval { color:var(--muted); font:11px ui-monospace,monospace; border-left:1px solid var(--border); padding-left:8px }
+#mode-badge { color:#f3bd71; border:1px solid #96601e; padding:3px 7px; border-radius:5px; font-size:10px; font-weight:750; letter-spacing:.06em; white-space:nowrap }
+.ohlc { min-height:25px; display:flex; align-items:center; gap:12px; padding:0 12px 5px; overflow:hidden; border-bottom:1px solid var(--border); color:var(--muted); font:11px ui-monospace,monospace; white-space:nowrap }
+.ohlc b { color:var(--text); font-weight:500 }
+#selected-time:empty { display:none }
+.chart { flex:1; position:relative; min-height:0 }
+canvas { display:block; width:100%; height:100%; touch-action:none; cursor:crosshair }
+.empty { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(90%,350px); display:grid; justify-items:center; text-align:center; gap:9px; padding:22px 14px; background:#141a24ee; border:1px solid var(--border); border-radius:10px; color:var(--muted); font-size:13px }
+.empty strong { color:var(--text); font-size:15px }
+.empty-actions { display:flex; gap:8px; margin-top:4px }
+.empty-actions button,.dialog-action { border:1px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--accent) }
+.panel-foot { display:flex; min-height:44px; align-items:center; justify-content:space-between; gap:5px; padding:0 8px; border-top:1px solid var(--border) }
+.ranges,.scale { display:flex; gap:2px; align-items:center }
+.ranges button,.scale button { color:var(--muted); min-height:38px; padding:0 8px; font:600 11px ui-monospace,monospace; border-radius:5px; white-space:nowrap }
+.scale button { font:600 11px system-ui,sans-serif }
+.status { min-height:41px; display:flex; justify-content:space-between; align-items:center; font:11px ui-monospace,monospace; color:var(--muted); gap:10px }
+#feed-button { min-height:34px; display:flex; align-items:center; gap:8px; text-align:left; border-radius:4px }
+.status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; background:#74829b; flex:none }
+.status-dot.live { background:#58cfb7 }
+.status-dot.stale,.status-dot.demo,.status-dot.history,.status-dot.partial { background:#e5af64 }
+.status-dot.failed { background:#f17a81 }
+.timezone { white-space:nowrap }
+dialog { width:min(94vw,440px); max-height:min(85dvh,740px); color:var(--text); background:#151b25; border:1px solid #394453; border-radius:14px; padding:0; box-shadow:0 18px 58px #0009 }
+dialog::backdrop { background:#060910b8 }
+.dialog-heading { display:flex; position:sticky; z-index:1; top:0; align-items:center; justify-content:space-between; padding:7px 14px 7px 18px; background:#151b25; border-bottom:1px solid var(--border) }
+.dialog-heading h2 { font-size:17px }
+.dismiss { width:44px; height:44px; border-radius:6px; color:var(--muted); font-size:24px }
+.interval-grid { display:grid; padding:16px; grid-template-columns:repeat(4,1fr); gap:8px }
+.interval-grid button { border:1px solid var(--border); min-height:46px; padding:3px }
+.layer-list { padding:5px 16px }
+.layer-list label,.layer-settings label { min-height:49px; display:flex; align-items:center; gap:10px; padding:5px 2px; border-bottom:1px solid var(--border) }
+.layer-list label>span:nth-child(2) { display:grid; gap:3px; flex:1 }
+.layer-list b,.layer-settings span { font-size:13px; font-weight:650 }
+.layer-list small { color:var(--muted); font-size:11px }
+.legend-color { width:10px; height:10px; border-radius:50%; flex:none }
+input[type="checkbox"] { width:20px; height:20px; accent-color:var(--accent); flex:none; margin:2px }
+.layer-settings { padding:0 16px 14px }
+.layer-settings label { justify-content:space-between; border:0 }
+dl { padding:0 18px; display:grid; gap:5px; margin:16px 0 }
+dt { color:var(--text); font-size:13px; font-weight:650 }
+dd { color:var(--muted); font-size:12px; margin:0 0 7px; line-height:1.4 }
+.dialog-action { margin:0 18px 16px }
+@media (max-width:540px) {
+  .shell { padding:0 9px }
+  .top { min-height:64px; gap:8px }
+  .brand { gap:8px }
+  .bitcoin { width:35px; height:35px; border-radius:10px; font-size:23px }
+  h1 { font-size:16px }
+  .quote strong { font-size:21px }
+  .toolbar { min-height:51px; gap:4px }
+  .intervals { gap:1px }
+  .intervals button { min-width:35px }
+  .menu { width:31px }
+  .with-icon { padding:0 7px }
+  .ohlc { gap:6px; font-size:9px; padding-left:8px }
+  .ohlc #selected-time { max-width:60px; overflow:hidden; text-overflow:ellipsis }
+  .panel-foot { padding:0 4px; min-height:41px }
+  .ranges button,.scale button { padding:0 5px; font-size:10px }
+  .status { min-height:36px; font-size:10px }
+}
+@media (max-width:350px) {
+  .with-icon span { display:none }
+  .ranges button,.scale button { padding:0 4px }
+  .scale { gap:0 }
+}
+@media (max-height:450px) {
+  .top { min-height:46px }
+  .toolbar { min-height:43px }
+  .panel-head { min-height:29px }
+  .status { min-height:32px }
+}
+button:disabled { opacity:.4; cursor:default }
+button:disabled:hover { background:transparent }
+.panel-options { display:flex; align-items:center; gap:6px; flex:none }
+#auto-scale { min-height:34px; padding:0 7px; border-radius:5px; font-size:11px; font-weight:650; white-space:nowrap }
+@media (max-width:360px) {
+  .panel-head { padding:0 8px }
+  .panel-options,.script { gap:4px }
+  #mode-badge { padding:3px 4px; font-size:8px }
+  #auto-scale { padding:0 5px }
+}

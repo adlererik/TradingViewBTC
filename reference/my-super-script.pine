@@ -1,0 +1,428 @@
+//@version=4
+study("My Super Script", overlay = true)
+//2 year Long timeframe investor tool to identify under/oversold price periods
+//When price area turns red the market is unstable. When green start thinking about buying.
+twoyearclose = sma(close, 730)
+twoyearclosex5 = twoyearclose * 5
+candles = plot(close, "", color.new(color.white, 100), linewidth=1)
+avgPlot=plot(twoyearclose, '', color.new(color.white, 100), linewidth = 1)
+avgMultPlot=plot(twoyearclosex5, '', color.new(color.white, 100), linewidth = 1)
+fill(avgMultPlot, candles, color = open < twoyearclosex5 ? na : color.new(color.red, 75))
+fill(avgPlot, candles, color = open  > twoyearclose ? na : color.new(color.green, 75))
+data1 = crossover (close, twoyearclosex5 * 1.0)
+plotshape(data1, color=color.new(color.red, 10), style=shape.arrowdown, location = location.abovebar, size = size.small, text="Over\nSold")
+//BTC has never dropped under the 200 week MA.
+// If BTC dips down to the 200 week MA. Buy here.
+avg200week = sma(close, 1400)
+plot(avg200week, "200 Week MA", color.white, linewidth=1)
+showlabels = input(title="Show Labels ?", type=input.bool, defval=true)
+offset_val = input(title="Label Offset", type=input.integer, defval=8)
+plotshape(showlabels ? avg200week : na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.white,0), show_last=1, text="200 WMA",  offset = offset_val, transp=100, title="200 Week MA")
+if crossover (avg200week, low)
+    l = label.new(bar_index, na)
+    label.set_text(l, text="BUY\n" + tostring(low))
+    label.set_size(l, size.small)
+    label.set_color(l, color.new(color.blue, 0))
+    label.set_yloc(l, yloc.belowbar)
+    label.set_style(l, label.style_labelup)
+    label.set_tooltip(l, "The 200 week moving avg has been crossed. Has only happened once.")
+//The Golden Ratio Multiplier
+//Each ATH top should kiss a line that is one down from the last ATH.
+//The next ATH should kiss the red line (350DMA * 3)
+sma350= sma(close, 350)
+sma111 = sma(close, 111)
+//plot(sma111, "SMA (close, 111)", color.lime, linewidth=3)
+//plot(sma350, "SMA (close, 350)",  color.orange, linewidth=1)
+//plot(sma350 * 1.618, "SMA350 x Golden Ratio", color.green, linewidth=2)
+//plot(sma350 * 2, "2024 ATH x 2", color.green, linewidth=1)
+//plotshape(showlabels ? sma350 * 2: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Golden Ratio 2024",  offset = offset_val, transp=100, title="Golden Ratio 2024")
+plot(sma350  * 3, "2021 ATH - Fib x3", color.yellow, linewidth=1)
+plotshape(showlabels ? sma350 * 3: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.yellow,0), show_last=1, text="Golden Ratio 2021",  offset = offset_val, transp=100, title="Golden Ratio")
+//plot(sma350  * 5, "2017 ATH - Fib x5", color.blue, linewidth=1)
+//plotshape(showlabels ? sma350 * 5: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.blue,0), show_last=1, text="Golden Ratio 2017",  offset = offset_val, transp=100, title="Golden Ratio 2017")
+//plot(sma350  * 8, "2013 ATH - Fib x8", color.teal, linewidth=1)
+//plot(sma350  * 13, "SMA350 x 13", color.aqua, linewidth=1)
+//plot(sma350  * 21, "SMA x 21", color.teal, linewidth=1)
+//Uses Pi Cyclic top to signal the ATH exits
+sma350pi= sma(close, 350)
+sma111pi = sma(close, 111)
+plot(sma350pi * 2, "pi cyclic slow", color.teal, linewidth=1)
+plotshape(showlabels ? sma350pi * 2: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.teal,0), show_last=1, text="Pi top Slow",  offset = offset_val, transp=100, title="Pi Cyclic top")
+plot(sma111pi, "pi cyclic fast", color.yellow, linewidth=1)
+plotshape(showlabels ? sma111pi: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.yellow,0), show_last=1, text="Pi top Fast",  offset = offset_val, transp=100, title="Cyclic Pi")
+if crossunder (sma350pi * 2, sma111pi)
+    l = label.new(bar_index, na)
+    label.set_text(l, text="SELL \n Pi Cycle Top \n" + tostring(close))
+    label.set_size(l, size.small)
+    label.set_color(l, color.new(color.red, 0))
+    label.set_yloc(l, yloc.abovebar)
+    label.set_style(l, label.style_labeldown)
+//Heatmap 200 Week Moving Average by Plan B
+//Historically, when we see orange and red dots assigned to the price chart,
+//this has been a good time to sell Bitcoin as the market overheats. Periods
+// where the price dots are purple and close to the 200 week MA have
+// historically been good times to buy.
+pre4weeks = sma(close, 1400)[30]
+now = sma(close, 1400)
+delta = pre4weeks - now
+deltaabs = abs(delta)
+pre = (deltaabs / pre4weeks)*100
+heatcolor = (pre >= 20 ? color.red : pre >= 15 ? color.orange : pre >= 10 ? color.yellow : pre >= 5 ? color.green : pre > 2.5 ? color.aqua : pre <= 2.5 ? color.purple : na)
+plot(pre, "testing", heatcolor, linewidth=3)
+plotshape(pre, style=shape.circle, color=heatcolor)
+plotshape(showlabels ? pre: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Heatmap 200 WMA - Plan B",  offset = offset_val, transp=100, title="Heatmap")
+if pre > 13 and pre <= 15 and sma350pi * 2 > sma111pi
+    l = label.new(bar_index, na)
+    label.set_text(l, text="Parabolic\n15%\n 200 WMA Delta")
+    label.set_size(l, size.tiny)
+    label.set_color(l, color.new(color.orange, 25))
+    label.set_yloc(l, yloc.abovebar)
+    label.set_style(l, label.style_labeldown)
+    label.delete(l[1])
+if pre > 15 and pre <= 20 and sma350pi * 2 > sma111pi
+    l = label.new(bar_index, na)
+    label.set_text(l, text="Hyper\nParabolic\n20%\n 200 WMA Delta")
+    label.set_size(l, size.tiny)
+    label.set_color(l, color.new(color.red, 25))
+    label.set_yloc(l, yloc.abovebar)
+    label.set_style(l, label.style_labeldown)
+    label.delete(l[1])
+//Diff Ribben
+//in
+div = input(1000000000, title="Position")
+//Get the data
+qu_difficulty = 'QUANDL:BCHAIN/DIFF'
+difficulty = security(qu_difficulty,'D', close[0])
+//Ribbon
+inputMVA1 = input(9,title="MA", type=input.integer, minval=1)
+res1 = input("D", type=input.resolution, title="Resolution")
+out1 = sma(difficulty/div, inputMVA1)
+inputMVA2 = input(14,title="MA", type=input.integer, minval=1)
+res2 = input("D", type=input.resolution, title="Resolution")
+out2 = sma(difficulty/div, inputMVA2)
+inputMVA3 = input(25,title="MA", type=input.integer, minval=1)
+res3 = input("D", type=input.resolution, title="Resolution")
+out3 = sma(difficulty/div, inputMVA3)
+inputMVA4 = input(40,title="MA", type=input.integer, minval=1)
+res4 = input("D", type=input.resolution, title="Resolution")
+out4 = sma(difficulty/div, inputMVA4)
+inputMVA5 = input(60,title="MA", type=input.integer, minval=1)
+res5 = input("D", type=input.resolution, title="Resolution")
+out5 = sma(difficulty/div, inputMVA5)
+inputMVA6 = input(90,title="MA", type=input.integer, minval=1)
+res6 = input("D", type=input.resolution, title="Resolution")
+out6 = sma(difficulty/div, inputMVA6)
+inputMVA7 = input(128,title="MA", type=input.integer, minval=1)
+res7 = input("D", type=input.resolution, title="Resolution")
+out7 = sma(difficulty/div, inputMVA7)
+inputMVA8 = input(200,title="MA", type=input.integer, minval=1)
+res8 = input("D", type=input.resolution, title="Resolution")
+out8 = sma(difficulty/div, inputMVA8)
+//Plot
+plot(out1, color = color.new(color.red, 50), linewidth = 1)
+plot(out2, color = color.new(color.orange, 50), linewidth = 1)
+plot(out3, color = color.new(color.yellow, 50), linewidth = 1)
+plot(out4, color = color.new(color.green, 50), linewidth = 1)
+plot(out5, color = color.new(color.aqua, 50), linewidth = 1)
+plot(out6, color = color.new(color.blue, 50), linewidth = 1)
+plot(out7, color = color.new(color.teal, 50), linewidth = 1)
+plot(out8, color = color.new(color.purple, 50), linewidth = 1)
+//Top Cap
+//Willy Woos fonund that the Avg Cap x 35 almost always hits at a ATH
+//input
+mul = input(35, title = "Multiplier")
+launchYear = input(2009, title = "Launch Year")
+launchMonth = input(01, title = "Launch Month")
+launchDay = input(03, title = "Launch Day")
+//Getting start of chart
+date = valuewhen(bar_index==0, time, 0)
+//Converting start of chart
+secondsRaw = floor(date/ 1000)
+minutesRaw = floor(secondsRaw / 60)
+hoursRaw = floor(minutesRaw / 60)
+daysRaw = floor(hoursRaw / 24)
+//Start of BTC
+startBTC = timestamp(launchYear,launchMonth,launchDay,00,00)
+secondsRawB = floor(startBTC / 1000)
+minutesRawB = floor(secondsRawB / 60)
+hoursRawB = floor(minutesRawB / 60)
+daysRawB = floor(hoursRawB / 24)
+//Calculation
+difference = daysRaw - daysRawB
+csum = mul*cum(close)/(difference+bar_index+1)
+//Plot
+plot(csum, title="Top Cap Should hit ATH", color = color.purple, linewidth = 2)
+plotshape(showlabels ? csum: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.purple,0), show_last=1, text="Hits at ATH - Woo 35xCap",  offset = offset_val, transp=100, title="Woos top")
+////
+len_s = input(30,"Hash Rate Short SMA (days).")
+len_l = input(60,"Hash Rate Long SMA (days).")
+live_HR_short = security("QUANDL:BCHAIN/HRATE", "D", sma(close,len_s),gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
+live_HR_long = security("QUANDL:BCHAIN/HRATE", "D", sma(close,len_l),gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
+capitulation = crossover (live_HR_long, live_HR_short)
+plotshape(capitulation, color=color.new(color.red, 10), style=shape.arrowdown, location = location.abovebar, size = size.small, text="Miner\nCapitulation")
+hashIncrease = crossunder (live_HR_long, live_HR_short)
+plotshape(hashIncrease, color=color.new(color.blue, 10), style=shape.arrowup, location = location.belowbar, size = size.small, text="Miner\nIncrease")
+// HALVINGS
+plot_halvings = input(true,"Plot Halvings")
+halving_1 = timestamp(2012,11,28,0,0)
+halving_2 = timestamp(2016,7,9,0,0)
+halving_3 = timestamp(2020,5,11,0,0)
+halving_4 = timestamp(2024,3,11,0,0) // projected! https://www.bitcoinclock.com/
+h1_range = time >= halving_1 - 2*(24*60*60*1000) and time <= halving_1 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
+h2_range = time >= halving_2 - 2*(24*60*60*1000) and time <= halving_2 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
+h3_range = time >= halving_3 - 2*(24*60*60*1000) and time <= halving_3 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
+h4_range = time >= halving_4 - 2*(24*60*60*1000) and time <= halving_4 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
+bgcolor(h1_range and plot_halvings? color.red : na, transp = 20)
+bgcolor(h2_range and plot_halvings? color.red : na, transp = 20)
+bgcolor(h3_range and plot_halvings? color.red : na, transp = 20)
+bgcolor(h4_range and plot_halvings? color.red : na, transp = 20)
+//NVT Signal
+//inputs
+greenZoneTop = input(25,title="Green Zone Top")
+yellowZoneTop = input(42,title="Yellow Zone Top")
+//Get the data
+qu_transactionVolume = 'QUANDL:BCHAIN/ETRVU'
+transactionVolume = security(qu_transactionVolume,'D', close[0])
+qu_marketCap = 'QUANDL:BCHAIN/MKTCP'
+marketCap = security(qu_marketCap,'D', close[0])
+//NVT
+inputMVA111 = input(90,title="MA", type=input.integer, minval=1)
+res111 = input("D", type=input.resolution, title="Resolution")
+out111 = sma(transactionVolume, inputMVA111)
+nvt = (marketCap/out111)
+//// plot(nvt, title="NVT", color = color.new(color.lime, 0) , linewidth = 1)
+///////////////
+// INPUTS
+DarkOrLight =   input("Dark", title="Dark mode or Light mode?", options=["Dark", "Light"])
+ShowFibs =      input("Y", title="Show Fibonacci Levels?", options=["Y","N"])
+ShowExtensions= input("Y", title="Show Curve Projections?", options=["Y","N"])
+HighIntercept = input(1.06930947, title="Top Curve Intercept", step=0.001)
+HighSlope =     input(0.00076, title="Top Curve Slope", step=0.00001)
+LowIntercept =  input(-3.0269716, title="Bottom Curve Intercept", step=0.001)
+LowSlope =      input(0.001329, title="Bottom Curve Slope", step=0.00001)
+// TIME CALCS
+TimeIndex =     time < 1279670400000 ? 3.0 : (time - 1279670400000) / 86400000
+Weight =        (log10(TimeIndex + 10) * TimeIndex * TimeIndex - TimeIndex) / 30000
+TimeDelta =     time - time[1]
+// TOP OF CHANNEL INTERCEPT & SLOPE CALCS
+HighSlopeCum =  HighSlope * TimeIndex
+HighLogDev =    TimeIndex > 2 ? log(Weight) + HighIntercept + HighSlopeCum : na
+// BOTTOM OF CHANNEL INTERCEPT & SLOPE CALCS
+LowSlopeCum =   LowSlope * TimeIndex
+LowLogDev =     TimeIndex > 2 ? log(Weight) + LowIntercept + LowSlopeCum : na
+// TOTAL CHANNEL LOG RANGE
+LogRange =      HighLogDev - LowLogDev
+// FIBONACCI LEVELS
+Fib9098Calc =   (LogRange * 0.9098) + LowLogDev
+Fib8541Calc =   (LogRange * 0.8541) + LowLogDev
+Fib7639Calc =   (LogRange * 0.7639) + LowLogDev
+Fib618Calc =    (LogRange * 0.618) + LowLogDev
+MidCalc =       (LogRange * 0.5) + LowLogDev
+Fib382Calc =    (LogRange * 0.382) + LowLogDev
+Fib2361Calc =   (LogRange * 0.2361) + LowLogDev
+Fib1459Calc =   (LogRange * 0.1459) + LowLogDev
+Fib0902Calc =   (LogRange * 0.0902) + LowLogDev
+// SCALE LOG VARIABLES TO LINEAR
+HighDev =       pow(2.718281828459, HighLogDev)
+Fib9098Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib9098Calc) : na
+Fib8541Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib8541Calc) : na
+Fib7639Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib7639Calc) : na
+Fib618Dev =     ShowFibs == "Y" ? pow(2.718281828459, Fib618Calc) : na
+MidDev =        pow(2.718281828459, MidCalc)
+Fib382Dev =     ShowFibs == "Y" ? pow(2.718281828459, Fib382Calc) : na
+Fib2361Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib2361Calc) : na
+Fib1459Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib1459Calc) : na
+Fib0902Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib0902Calc) : na
+LowDev =        pow(2.718281828459, LowLogDev)
+// COLOR SCHEME
+ColorScheme =   DarkOrLight == "Dark" ? color(color.white) : color(color.black)
+// PLOTS
+plot(HighDev, color=ColorScheme, transp=0, title="100% - Top of Channel")
+//plot(Fib9098Dev, color=ColorScheme, transp=50, title="90.98% - Fibonacci Level")
+//plot(Fib8541Dev, color=ColorScheme, transp=50, title="85.41% - Fibonacci Level")
+//plot(Fib7639Dev, color=ColorScheme, transp=50, title="76.39% - Fibonacci Level")
+//plot(Fib618Dev, color=ColorScheme, transp=50, title="61.80% - Fibonacci Level")
+plot(MidDev, color=ColorScheme, transp=0, title="50% - Middle of Channel")
+//plot(Fib382Dev, color=ColorScheme, transp=50, title="38.20% - Fibonacci Level")
+//plot(Fib2361Dev, color=ColorScheme, transp=50, title="23.61% - Fibonacci Level")
+//plot(Fib1459Dev, color=ColorScheme, transp=50, title="14.59% - Fibonacci Level")
+//plot(Fib0902Dev, color=ColorScheme, transp=50, title="9.02% - Fibonacci Level")
+plot(LowDev, color=ColorScheme, transp=0, title="0% - Bottom of Channel")
+//////////////////////////////////////////////////////////
+//                                                      //
+// CURVE EXTENSION DRAWING FUNCTION & HELPER VARIABLES  //
+//                                                      //
+//////////////////////////////////////////////////////////
+// CURVE EXTENSION FUNCTION
+ExtenZe(_i, _slope, _intercept) =>
+    TI = ((time + TimeDelta *_i) -1279670400000) / 86400000
+    W = (log10(TI + 10) * TI * TI - TI) / 30000
+    HSC = _slope * TI
+    HLD = log(W) + _intercept + HSC
+    HD = pow(2.718281828459, HLD)
+    HD
+// VARIABLES FOR ADJUSTING LENGTH OF CURVE EXTENSIONS RELATIVE TO CHART TIME-FRAME
+ForLoopStep = timeframe.ismonthly == 1 ? ceil( 12 / timeframe.multiplier) :
+              timeframe.isweekly == 1 ? ceil(26 / timeframe.multiplier) :
+              timeframe.isdaily == 1 ? ceil(91 / timeframe.multiplier) :
+              (timeframe.isminutes == 1) and (timeframe.multiplier > 59) ? ceil(10080 / timeframe.multiplier) : na
+ForLoopMax =    na(ForLoopStep) ? na : ForLoopStep * 13
+// MID CURVE SLOPE & INTERCEPT
+MidSlope =      (HighSlope + LowSlope) * 0.5
+MidIntercept =  (HighIntercept + LowIntercept) * 0.5
+// CHECK IF LAST BAR & "Show Curve Projections" IS CHECKED, THEN DRAW CURVE EXTENZES
+if barstate.islast and ShowExtensions == "Y"
+    for i = 0 to ForLoopMax-1 by ForLoopStep
+        line.new(time + TimeDelta * i, ExtenZe(i, HighSlope, HighIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, HighSlope, HighIntercept), xloc=xloc.bar_time, color=ColorScheme)
+        line.new(time + TimeDelta * i, ExtenZe(i, LowSlope, LowIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, LowSlope, LowIntercept), xloc=xloc.bar_time, color=ColorScheme)
+        line.new(time + TimeDelta * i, ExtenZe(i, MidSlope, MidIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, MidSlope, MidIntercept), xloc=xloc.bar_time, color=ColorScheme)
+////// Buy when price dips under log channel. Sell when channel top is broken
+if crossover (LowDev, low)
+    l = label.new(bar_index, na)
+    label.set_text(l, text="BUY\n" + tostring(low))
+    label.set_size(l, size.small)
+    label.set_color(l, color.new(color.lime, 0))
+    label.set_yloc(l, yloc.belowbar)
+    label.set_style(l, label.style_labelup)
+if crossunder (HighDev, high)
+    l = label.new(bar_index, na)
+    label.set_text(l, text="SELL \n Broke log channel \n" + tostring(high))
+    label.set_size(l, size.small)
+    label.set_color(l, color.new(color.red, 0))
+    label.set_yloc(l, yloc.abovebar)
+    label.set_style(l, label.style_labeldown)
+//////////////////////////////////////// SAR
+// SAR #1
+// Lucid Sar
+// Branded under the name "Lucid SAR"
+// as agreed to with Lucid Investment Strategies LLC on July 9, 2019
+// https://lucidinvestmentstrategies.com/
+// SAR #2
+// Peterbolic Sar
+// Using the name "Peterbolic SAR"
+// as agreed to by Peter Brandt on October 2, 2019
+// - https://twitter.com/PeterLBrandt/status/1179365590668075008
+// in response to request from Sawcruhteez
+// - https://twitter.com/Sawcruhteez/status/1179213105705836544
+// Sawcruhteez gives credit to @CrazyGabey for coming up with the name
+// - https://twitter.com/Sawcruhteez/status/1179213196583940097
+// SAR #3
+// Sawcruhteez Sar
+// Branded under the name "Sawcruhteez SAR"
+// as agreed to Sawcruhteez on September 11, 2019
+// Open Source on github
+// https://github.com/casey-bowman/sar
+// Created by Casey Bowman on July 4, 2019
+// MIT License
+// Copyright (c) 2019 Casey Bowman
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+AF_initial = input(0.00285714)
+AF_increment = input(0.0014)
+AF_maximum = input(0.2)
+LUCID_SAR(initial, increment, maximum) =>
+    // start with uptrend
+    uptrend = true
+    new_trend = false
+    EP = high
+    SAR = low
+    AF = AF_initial
+    // before a reversal, the reversal_state is 0;
+    // after a reversal, within the same candle as the reversal,
+    // the reversal_state can be 1 (uptrend) or 2 (downtrend)
+    reversal_state = 0
+    if not na(uptrend[1]) and not na(new_trend[1])
+        if reversal_state == 0
+            if uptrend[1]
+                EP := max(high, EP[1])
+            else
+                EP := min(low, EP[1])
+            if new_trend[1]
+                AF := AF_initial
+            else
+                if EP != EP[1]
+                    AF := min(AF_maximum, AF[1] + AF_increment)
+                else
+                    AF := AF[1]
+            SAR := SAR[1] + AF * (EP - SAR[1])
+            if uptrend[1]
+                SAR := min(SAR, low[1])
+                if not na(low[2])
+                    SAR := min(SAR, low[2])
+                if SAR > low
+                    uptrend := false
+                    new_trend := true
+                    SAR := max(high, EP[1])
+                    EP := min(low, low[1])
+                    reversal_state := 2
+                else
+                    uptrend := true
+                    new_trend := false
+            else
+                SAR := max(SAR, high[1])
+                if not na(high[2])
+                    SAR := max(SAR, high[2])
+                if SAR < high
+                    uptrend := true
+                    new_trend := true
+                    SAR := min(low, EP[1])
+                    EP := max(high, high[1])
+                    reversal_state := 1
+                else
+                    uptrend := false
+                    new_trend := false
+        else
+            if reversal_state == 1
+                EP := high
+                if low < SAR
+                    SAR := EP
+                    EP := low
+                    reversal_state == 2
+                    uptrend := false
+            else
+                EP := low
+                if high > SAR
+                    SAR := EP
+                    EP := high
+                    reversal_state == 1
+                    uptrend := true
+    SAR
+L_SAR = LUCID_SAR(AF_initial, AF_increment, AF_maximum)
+plot(L_SAR, color = color.blue, style = plot.style_cross, linewidth = 2)
+/////////////////////////////////// ///////////////////7
+// Guppy but all condenced into a single line. Gray is bad and green is good.
+src = close,
+//Slow EMA
+len7 = input(30, minval=1, title="Slow EMA 7")
+len8 = input(35, minval=1, title="Slow EMA 8")
+len9 = input(40, minval=1, title="Slow EMA 9")
+len10 = input(45, minval=1, title="Slow EMA 10")
+len11 = input(50, minval=1, title="Slow EMA 11")
+len12 = input(60, minval=1, title="Slow EMA 12")
+//Slow EMA
+ema7 = ema(src, len7)
+ema8 = ema(src, len8)
+ema9 = ema(src, len9)
+ema10 = ema(src, len10)
+ema11 = ema(src, len11)
+ema12 = ema(src, len12)
+//Slow EMA Color Rules
+colslowL = ema7 > ema8 and ema8 > ema9 and ema9 > ema10 and ema10 > ema11 and ema11 > ema12 // makes green
+colslowS = ema7 < ema8 and ema8 < ema9 and ema9 < ema10 and ema10 < ema11 and ema11 < ema12 // makes orange
+//Slow EMA Final Color Rules
+colFinal2 = colslowL  ? color.lime : colslowS ? na : color.orange
+plot(ema12, color=colFinal2, style = plot.style_cross, linewidth = 1)
+plotshape(showlabels ? ema12 : na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Guppy in 1 line.",  offset = offset_val, transp=100, title="Full Guppy in 1 line")
