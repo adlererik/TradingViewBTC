@@ -119,3 +119,22 @@ button:disabled:hover { background:transparent }
   #mode-badge { padding:3px 4px; font-size:8px }
   #auto-scale { padding:0 5px }
 }
+
+#feed-button { flex:1; min-width:0 }
+#help { min-height:38px; padding:0 10px; border:1px solid var(--border); border-radius:6px; color:var(--accent); font:650 12px system-ui,sans-serif; white-space:nowrap }
+#help-dialog { width:min(94vw,620px); max-height:min(89dvh,820px) }
+#help-dialog[open] { display:flex; flex-direction:column; overflow:hidden }
+#help-dialog .dialog-heading { position:static; flex:none; gap:12px }
+.dismiss { flex:none }
+.language-setting { display:flex; flex:none; align-items:center; justify-content:space-between; gap:12px; padding:8px 18px; border-bottom:1px solid var(--border); font-size:13px }
+.language-setting select { min-height:40px; max-width:58%; padding:0 8px; font:inherit; color:var(--text); background:var(--quiet); border:1px solid #394453; border-radius:6px }
+.guide { overflow:auto; overflow-wrap:anywhere; overscroll-behavior:contain; min-height:0; padding:16px 18px 22px; font-size:14px; line-height:1.6; color:var(--muted) }
+.guide strong,.guide h3 { color:var(--text) }
+.guide h3 { margin:22px 0 6px; font-size:16px; line-height:1.3 }
+.guide h3:first-child { margin-top:0 }
+.guide p + p { margin-top:8px }
+.guide ul { margin:8px 0; padding-left:20px }
+.guide li + li { margin-top:4px }
+.guide table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; text-align:left; line-height:1.45 }
+.guide th,.guide td { padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top }
+.guide th { color:var(--text) }

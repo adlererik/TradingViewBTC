@@ -1,10 +1,8 @@
 import {channel, series, DAY} from './indicators.mjs';
 
-const number = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
-const price = new Intl.NumberFormat('en-US',{maximumFractionDigits:2});
-const month = new Intl.DateTimeFormat('en-US',{month:'short',timeZone:'UTC'});
-const date = new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
-const clock = new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'UTC'});
+import {createLocale} from './locale.mjs';
+
+const defaultLocale = createLocale('en');
 const mono = 'ui-monospace, Menlo, monospace';
 const clamp = (value,min,max) => Math.max(min,Math.min(max,value));
 
@@ -16,10 +14,11 @@ function gestureAxis(x,y) {
 }
 
 export class Chart {
-  constructor(canvas, settings, select, lockScale = () => {}) {
+  constructor(canvas, settings, select, lockScale = () => {}, locale = defaultLocale) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.settings = settings;
+    this.locale = locale;
     this.select = select;
     this.lockScale = lockScale;
     this.priceRange = null;
@@ -325,11 +324,12 @@ export class Chart {
       ctx.fillStyle = lastBar.c >= lastBar.o ? '#2da89a' : '#e26a70';
       ctx.fillRect(plotRight,y0-10,axis,20);
       ctx.fillStyle = '#08171a'; ctx.textAlign = 'left';
-      ctx.fillText(price.format(lastBar.c),plotRight+4,y0,axis-6);
+      ctx.fillText(this.locale.price.format(lastBar.c),plotRight+4,y0,axis-6);
     }
   }
 
   scales(ctx,g) {
+    const {number,price,month,date,clock} = this.locale;
     const {lo,hi,y,top,bottom,plotRight,w,h,x,first,last,step,interval,bars} = g;
     const target = Math.max(3,Math.min(11,Math.round(h/51)));
     const increment = Math.max((hi-lo)/target,hi*.001);
@@ -477,7 +477,7 @@ export class Chart {
     const bar = this.bars[idx];
     if (!bar || x(idx) < 0 || x(idx) > plotRight) return;
     const marks = series.filter(s => s.label && enabled(s.group)).map(s => ({
-      ...s, py:y(s.key === 'guppy' ? bar.guppyValue : bar[s.key])
+      ...s, label:this.locale.t(s.key+'Label'), py:y(s.key === 'guppy' ? bar.guppyValue : bar[s.key])
     })).filter(m => m.py > top && m.py < bottom-5).sort((a,b) => a.py-b.py);
     ctx.font = '600 9px system-ui,sans-serif';
     ctx.textAlign = 'left';
@@ -495,6 +495,7 @@ export class Chart {
   }
 
   signals(ctx,first,last,x,y,enabled) {
+    const {t,price} = this.locale;
     ctx.font = '600 9px system-ui,sans-serif';
     ctx.textAlign = 'center';
     for (let i=first;i<=last;i++) {
@@ -511,7 +512,8 @@ export class Chart {
         ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px-3.5,py+direction*5);
         ctx.lineTo(px+3.5,py+direction*5); ctx.closePath(); ctx.fill();
         if (this.count > 220) continue;
-        const detail = Number.isFinite(s.price) ? s.title+' '+price.format(s.price) : s.title;
+        const title = t(s.key);
+        const detail = Number.isFinite(s.price) ? title+' '+price.format(s.price) : title;
         const rows = detail.split('\n');
         const width = Math.max(...rows.map(row => ctx.measureText(row).width))+8;
         const tx = clamp(px,width/2+2,this.geometry.plotRight-width/2-2);

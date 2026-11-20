@@ -7,33 +7,33 @@ const GENESIS = Date.UTC(2009, 0, 3) / 1000;
 const CHANNEL_START = 1279670400;
 
 export const groups = [
-  ['investor', '2-year investor bands', '730-bar average and its 5× band', '#68af72'],
-  ['wma', '200 Week MA', '1,400-bar average and BUY labels', '#f0f1f5'],
-  ['heat', '200 WMA heatmap', '30-bar change and parabolic signals', '#b03ab3'],
-  ['pi', 'Pi Cycle Top', '111-bar and 2× 350-bar averages', '#f5db32'],
-  ['golden', 'Golden Ratio Multiplier', '3× the 350-bar average', '#f3cb56'],
-  ['woo', 'Woo Top Cap', '35× cumulative average adjusted from Genesis', '#be58d4'],
-  ['sar', 'Lucid SAR', 'Custom parabolic stop and reversal', '#29a0ff'],
-  ['guppy', 'Guppy in one line', '60-bar EMA, colored by slow EMA order', '#58dc74'],
-  ['channel', 'Logarithmic channel', 'Top, middle and bottom curves with signals', '#e2e5ed'],
-  ['difficulty', 'Difficulty ribbon', 'Eight mining difficulty averages', '#e39d66'],
-  ['miners', 'Miner signals', '30-day and 60-day hash-rate crossings', '#36accd'],
-  ['halvings', 'Halving bands', 'Dates and ±2-day bands from the original script', '#f27b82']
+  ['investor', '#68af72'],
+  ['wma', '#f0f1f5'],
+  ['heat', '#b03ab3'],
+  ['pi', '#f5db32'],
+  ['golden', '#f3cb56'],
+  ['woo', '#be58d4'],
+  ['sar', '#29a0ff'],
+  ['guppy', '#58dc74'],
+  ['channel', '#e2e5ed'],
+  ['difficulty', '#e39d66'],
+  ['miners', '#36accd'],
+  ['halvings', '#f27b82']
 ];
 
 export const series = [
-  {key:'wma', group:'wma', color:'#f4f3f6', label:'200 WMA'},
-  {key:'piFast', group:'pi', color:'#f7dc27', label:'Pi Top Fast'},
-  {key:'piSlow', group:'pi', color:'#009d91', label:'Pi Top Slow'},
-  {key:'golden', group:'golden', color:'#eec752', label:'Golden Ratio 2021'},
-  {key:'woo', group:'woo', color:'#ad46bd', label:'Woo Top Cap', width:2},
+  {key:'wma', group:'wma', color:'#f4f3f6', label:true},
+  {key:'piFast', group:'pi', color:'#f7dc27', label:true},
+  {key:'piSlow', group:'pi', color:'#009d91', label:true},
+  {key:'golden', group:'golden', color:'#eec752', label:true},
+  {key:'woo', group:'woo', color:'#ad46bd', label:true, width:2},
   {key:'logHigh', group:'channel', color:'#ececf3'},
   {key:'logMid', group:'channel', color:'#ececf3'},
   {key:'logLow', group:'channel', color:'#ececf3'},
   ...['#ea606b','#f48f3c','#f3d849','#64c57d','#42c8cf','#367feb','#249e9e','#ae62c3']
     .map((color, i) => ({key:'diff'+i, group:'difficulty', color, alpha:.5})),
   {key:'sar', group:'sar', color:'#279fff', width:1.5, cross:true},
-  {key:'guppy', group:'guppy', color:'#30e36c', cross:true, label:'Guppy in 1 line'}
+  {key:'guppy', group:'guppy', color:'#30e36c', cross:true, label:true}
 ];
 
 export function sma(values, period) {
@@ -161,33 +161,33 @@ export function calculate(bars, network, timeframe) {
       signals:[]
     };
     ribbon.forEach((line, j) => { item['diff'+j] = line[i]; });
-    const add = (group, position, color, title, price, arrow = false) => {
-      const signal = {group, position, color, title, price, arrow};
+    const add = (group, position, color, key, price, arrow = false) => {
+      const signal = {group, position, color, key, price, arrow};
       item.signals.push(signal);
       return signal;
     };
     if (crossed(bar.c, highBand, previous.c, previous.highBand))
-      add('investor', 'above', '#ec585d', 'Over\nSold', undefined, true);
+      add('investor', 'above', '#ec585d', 'overSold', undefined, true);
     if (crossed(item.wma, bar.l, previous.wma, previous.l))
-      add('wma', 'below', '#259def', 'BUY', bar.l);
+      add('wma', 'below', '#259def', 'buy', bar.l);
     if (crossed(piFast, piSlow, previous.piFast, previous.piSlow))
-      add('pi', 'above', '#f26669', 'SELL · Pi Cycle Top', bar.c);
+      add('pi', 'above', '#f26669', 'sellPi', bar.c);
     if (piSlow > piFast && heat > 13 && heat <= 15) {
       if (lastParabolic) lastParabolic.hidden = true;
-      lastParabolic = add('heat', 'above', '#f39827', 'Parabolic · 15%');
+      lastParabolic = add('heat', 'above', '#f39827', 'parabolic');
     }
     if (piSlow > piFast && heat > 15 && heat <= 20) {
       if (lastHyper) lastHyper.hidden = true;
-      lastHyper = add('heat', 'above', '#ef6669', 'Hyper Parabolic · 20%');
+      lastHyper = add('heat', 'above', '#ef6669', 'hyperParabolic');
     }
     if (crossed(long[i], short[i], long[i-1], short[i-1]))
-      add('miners', 'above', '#ef6669', 'Miner\nCapitulation', undefined, true);
+      add('miners', 'above', '#ef6669', 'minerCapitulation', undefined, true);
     if (crossed(short[i], long[i], short[i-1], long[i-1]))
-      add('miners', 'below', '#2ba4f9', 'Miner\nIncrease', undefined, true);
+      add('miners', 'below', '#2ba4f9', 'minerIncrease', undefined, true);
     if (crossed(logLow, bar.l, previous.logLow, previous.l))
-      add('channel', 'below', '#65df61', 'BUY', bar.l);
+      add('channel', 'below', '#65df61', 'buy', bar.l);
     if (crossed(bar.h, logHigh, previous.h, previous.logHigh))
-      add('channel', 'above', '#ef6669', 'SELL · Log Channel', bar.h);
+      add('channel', 'above', '#ef6669', 'sellChannel', bar.h);
     previous = item;
     return item;
   });

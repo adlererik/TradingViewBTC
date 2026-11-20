@@ -1,9 +1,11 @@
 package com.bitcoin.overlay;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.view.View;
 import android.view.WindowInsets;
 import android.webkit.WebResourceRequest;
@@ -25,6 +27,7 @@ public final class MainActivity extends Activity {
     private static final String PRICE = "https://www.bitstamp.net/api/v2/ohlc/btcusd/";
     private static final String MINING = "https://mempool.space/api/v1/mining/hashrate/all";
     private WebView webView;
+    private String homeUrl;
 
     @Override
     @SuppressWarnings("deprecation")
@@ -56,7 +59,10 @@ public final class MainActivity extends Activity {
         }
         setContentView(webView);
         webView.requestApplyInsets();
-        webView.loadUrl(HOME);
+        LocaleList locales = Resources.getSystem().getConfiguration().getLocales();
+        String language = locales.isEmpty() ? "en" : locales.get(0).getLanguage();
+        homeUrl = Uri.parse(HOME).buildUpon().appendQueryParameter("lang", language).build().toString();
+        webView.loadUrl(homeUrl);
     }
 
     @Override
@@ -72,7 +78,7 @@ public final class MainActivity extends Activity {
     private final class LocalClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            return !HOME.equals(request.getUrl().toString());
+            return !homeUrl.equals(request.getUrl().toString());
         }
 
         @Override

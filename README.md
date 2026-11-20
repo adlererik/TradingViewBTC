@@ -18,6 +18,7 @@ The APK is signed for direct installation. It uses the same signing certificate 
 
 ## First five minutes
 
+- Tap **Help me** (**Hjälp mig** in Swedish) to read the beginner’s indicator guide, which is available offline. By default the app uses Swedish when Swedish is the primary Android system language and English otherwise. Choose **Svenska**, **English**, or **Follow Android** under **App language** in the guide.
 - Open the chart and leave it on **1D** while getting to know the indicators. Each candle represents one day of Bitstamp BTC/USD trading. A tap shows the candle’s open, high, low and close.
 - Open **Overlays** and turn on just the indicators you want to compare. Start with **200 Week MA** for long-term context and **Guppy in one line** for a more recent trend. The [indicator guide](INDICATORS.md) explains all 12 and shows how they fit together.
 - Drag to move around the chart. Pinch horizontally to zoom time, vertically to zoom price, or diagonally to zoom both. Vertical gestures hold the price scale in place. Tap **Auto scale** to fit the visible prices again.

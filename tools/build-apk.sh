@@ -16,7 +16,7 @@ main="$project/app/src/main"
 "$tools/aapt2" compile --dir "$main/res" -o "$build/resources.zip"
 "$tools/aapt2" link -o "$build/resources.apk" -I "$platform" \
   --manifest "$main/AndroidManifest.xml" --min-sdk-version 26 --target-sdk-version 35 \
-  --version-code 3 --version-name 1.1.1 -A "$main/assets" "$build/resources.zip"
+  --version-code 4 --version-name 1.2.0 -A "$main/assets" "$build/resources.zip"
 
 mapfile -d '' sources < <(find "$main/java" -name '*.java' -print0)
 if [[ -n "${ECJ_JAR:-}" ]]; then

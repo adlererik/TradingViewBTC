@@ -17,86 +17,105 @@
         <div><h1>BTC<span>/</span>USD</h1><span class="exchange">BITSTAMP</span></div>
       </div>
       <div class="quote"><strong id="price">—</strong><span id="change">—</span></div>
-      <button id="refresh" class="icon" type="button" aria-label="Refresh prices" title="Refresh prices">
+      <button id="refresh" class="icon" type="button" data-label="refresh" data-title="refresh">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.2 6.1M20 6v5h-5"/></svg>
       </button>
     </header>
 
-    <nav class="toolbar" aria-label="Chart controls">
-      <div class="intervals" id="quick-intervals" aria-label="Common intervals">
-        <button type="button" data-interval="1h">1H</button>
-        <button type="button" data-interval="4h">4H</button>
-        <button type="button" data-interval="1D" aria-pressed="true">1D</button>
-        <button type="button" data-interval="1W">1W</button>
-        <button type="button" data-interval="1M">1M</button>
+    <nav class="toolbar" data-label="chartControls">
+      <div class="intervals" id="quick-intervals" data-label="commonIntervals">
+        <button type="button" data-interval="1h"></button>
+        <button type="button" data-interval="4h"></button>
+        <button type="button" data-interval="1D" aria-pressed="true"></button>
+        <button type="button" data-interval="1W"></button>
+        <button type="button" data-interval="1M"></button>
       </div>
-      <button id="interval-menu" class="icon menu" aria-haspopup="dialog" aria-label="All intervals" title="All intervals">
+      <button id="interval-menu" class="icon menu" type="button" aria-haspopup="dialog" data-label="allIntervals" data-title="allIntervals">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
       </button>
-      <button id="layers" class="with-icon" type="button" aria-haspopup="dialog" aria-label="Overlay settings">
+      <button id="layers" class="with-icon" type="button" aria-haspopup="dialog" data-label="overlaySettings">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4 8 4-8 4-8-4zm-8 8 8 4 8-4m-16 4 8 4 8-4"/></svg>
-        <span>Overlays</span>
+        <span data-text="overlays"></span>
       </button>
     </nav>
 
-    <section class="panel" aria-label="Bitcoin chart">
+    <section class="panel" data-label="bitcoinChart">
       <div class="panel-head">
-        <div class="script"><span class="script-dot"></span><h2>My Super Script</h2><span id="active-interval">1D</span></div>
+        <div class="script"><span class="script-dot"></span><h2>My Super Script</h2><span id="active-interval"></span></div>
         <div class="panel-options">
           <div id="mode-badge" hidden></div>
-          <button id="auto-scale" type="button" aria-pressed="true">Auto scale</button>
+          <button id="auto-scale" type="button" aria-pressed="true" data-text="autoScale"></button>
         </div>
       </div>
-      <div id="ohlc" class="ohlc" aria-label="Selected candle prices">
+      <div id="ohlc" class="ohlc" data-label="candlePrices">
         <span id="selected-time"></span>
-        <span>O <b id="open">—</b></span><span>H <b id="high">—</b></span>
-        <span>L <b id="low">—</b></span><span>C <b id="close">—</b></span>
+        <span data-title="open"><span data-text="openShort"></span> <b id="open">—</b></span>
+        <span data-title="high">H <b id="high">—</b></span>
+        <span data-title="low">L <b id="low">—</b></span>
+        <span data-title="close"><span data-text="closeShort"></span> <b id="close">—</b></span>
       </div>
       <div class="chart" id="chart">
-        <canvas id="plot" tabindex="0" aria-label="Bitcoin price and overlay chart. Drag or pinch horizontally, vertically or diagonally. Tap to inspect candles. Arrow keys pan and plus and minus zoom."></canvas>
+        <canvas id="plot" tabindex="0" data-label="chartInstructions"></canvas>
         <div class="empty" id="empty" role="status">
-          <strong id="empty-title">Loading Bitstamp BTC/USD</strong>
-          <div id="empty-detail">Fetching recent candles</div>
+          <strong id="empty-title"></strong>
+          <div id="empty-detail"></div>
           <div class="empty-actions" id="empty-actions" hidden>
-            <button id="retry" type="button">Retry</button><button id="sample" type="button">View demo</button>
+            <button id="retry" type="button" data-text="retry"></button><button id="sample" type="button" data-text="viewDemo"></button>
           </div>
         </div>
       </div>
       <div class="panel-foot">
-        <div id="ranges" class="ranges" aria-label="Visible chart range"></div>
+        <div id="ranges" class="ranges" data-label="visibleRange"></div>
         <div class="scale">
-          <button id="fit" type="button" aria-pressed="false" title="Include all overlays in price scale">All plots</button>
-          <button id="log" type="button" aria-pressed="false" title="Logarithmic price scale">Log</button>
-          <button id="latest" type="button" title="Jump to latest candle">Latest</button>
+          <button id="fit" type="button" aria-pressed="false" data-title="allPlotsTitle" data-text="allPlots"></button>
+          <button id="log" type="button" aria-pressed="false" data-title="logTitle" data-text="log"></button>
+          <button id="latest" type="button" data-title="latestTitle" data-text="latest"></button>
         </div>
       </div>
     </section>
     <footer class="status">
-      <button id="feed-button" type="button" aria-haspopup="dialog" title="Data sources and status">
-        <span id="status-dot" class="status-dot"></span><span id="market-state" aria-live="polite">Connecting to Bitstamp</span>
+      <button id="feed-button" type="button" aria-haspopup="dialog" data-title="feedStatus">
+        <span id="status-dot" class="status-dot" aria-hidden="true"></span><span id="market-state" aria-live="polite"></span>
       </button>
       <span class="timezone">UTC · USD</span>
+      <button id="help" type="button" aria-haspopup="dialog" data-text="help"></button>
     </footer>
   </main>
 
-  <dialog id="interval-dialog">
-    <div class="dialog-heading"><h2>Chart interval</h2><button class="dismiss" aria-label="Close interval picker">×</button></div>
+  <dialog id="interval-dialog" aria-labelledby="interval-title">
+    <div class="dialog-heading"><h2 id="interval-title" data-text="chartInterval"></h2><button class="dismiss" data-label="dismiss">×</button></div>
     <div id="interval-grid" class="interval-grid"></div>
   </dialog>
 
-  <dialog id="layers-dialog">
-    <div class="dialog-heading"><h2>Overlays</h2><button class="dismiss" aria-label="Close overlay settings">×</button></div>
+  <dialog id="layers-dialog" aria-labelledby="overlays-title">
+    <div class="dialog-heading"><h2 id="overlays-title" data-text="overlays"></h2><button class="dismiss" data-label="dismiss">×</button></div>
     <div id="layer-list" class="layer-list"></div>
     <div class="layer-settings">
-      <label><span>End labels</span><input id="end-labels" type="checkbox" checked></label>
-      <label><span>Log-channel projections</span><input id="projections" type="checkbox" checked></label>
+      <label><span data-text="endLabels"></span><input id="end-labels" type="checkbox" checked></label>
+      <label><span data-text="projections"></span><input id="projections" type="checkbox" checked></label>
     </div>
   </dialog>
 
-  <dialog id="feed-dialog">
-    <div class="dialog-heading"><h2>Data sources</h2><button class="dismiss" aria-label="Close data sources">×</button></div>
+  <dialog id="feed-dialog" aria-labelledby="feed-title">
+    <div class="dialog-heading"><h2 id="feed-title" data-text="dataSources"></h2><button class="dismiss" data-label="dismiss">×</button></div>
     <dl id="feed-list"></dl>
-    <button class="dialog-action" id="demo-toggle" type="button">View demo chart</button>
+    <button class="dialog-action" id="demo-toggle" type="button"></button>
+  </dialog>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-heading">
+      <h2 id="help-title" data-text="guideTitle"></h2>
+      <button class="dismiss" type="button" data-label="dismiss">×</button>
+    </div>
+    <label class="language-setting" for="language">
+      <span data-text="languageSetting"></span>
+      <select id="language">
+        <option value="system" data-text="systemLanguage"></option>
+        <option value="en" lang="en" data-text="english"></option>
+        <option value="sv" lang="sv" data-text="swedish"></option>
+      </select>
+    </label>
+    <article class="guide" id="guide" tabindex="0" aria-labelledby="help-title"></article>
   </dialog>
 </body>
 </html>
