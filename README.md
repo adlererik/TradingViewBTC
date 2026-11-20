@@ -4,6 +4,10 @@ TradingViewBTC is a small Android app for watching Bitcoin’s price in US dolla
 
 [Download the Android APK](https://github.com/adlererik/TradingViewBTC/releases/latest) · [Read the indicator guide](INDICATORS.md)
 
+![TradingViewBTC in dark mode showing daily Bitcoin candles and indicator overlays](docs/tradingviewbtc-demo.jpg)
+
+*Daily Bitcoin chart in demo mode with simulated prices.*
+
 ## Install on Android
 
 1. Open the [latest release](https://github.com/adlererik/TradingViewBTC/releases/latest) on an Android phone running Android 8.0 or newer.
