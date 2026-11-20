@@ -1,319 +1,279 @@
-//@version=4
-study("My Super Script", overlay = true)
-//2 year Long timeframe investor tool to identify under/oversold price periods
-//When price area turns red the market is unstable. When green start thinking about buying.
-twoyearclose = sma(close, 730)
-twoyearclosex5 = twoyearclose * 5
-candles = plot(close, "", color.new(color.white, 100), linewidth=1)
-avgPlot=plot(twoyearclose, '', color.new(color.white, 100), linewidth = 1)
-avgMultPlot=plot(twoyearclosex5, '', color.new(color.white, 100), linewidth = 1)
-fill(avgMultPlot, candles, color = open < twoyearclosex5 ? na : color.new(color.red, 75))
-fill(avgPlot, candles, color = open  > twoyearclose ? na : color.new(color.green, 75))
-data1 = crossover (close, twoyearclosex5 * 1.0)
-plotshape(data1, color=color.new(color.red, 10), style=shape.arrowdown, location = location.abovebar, size = size.small, text="Over\nSold")
-//BTC has never dropped under the 200 week MA.
-// If BTC dips down to the 200 week MA. Buy here.
-avg200week = sma(close, 1400)
-plot(avg200week, "200 Week MA", color.white, linewidth=1)
-showlabels = input(title="Show Labels ?", type=input.bool, defval=true)
-offset_val = input(title="Label Offset", type=input.integer, defval=8)
-plotshape(showlabels ? avg200week : na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.white,0), show_last=1, text="200 WMA",  offset = offset_val, transp=100, title="200 Week MA")
-if crossover (avg200week, low)
-    l = label.new(bar_index, na)
-    label.set_text(l, text="BUY\n" + tostring(low))
-    label.set_size(l, size.small)
-    label.set_color(l, color.new(color.blue, 0))
-    label.set_yloc(l, yloc.belowbar)
-    label.set_style(l, label.style_labelup)
-    label.set_tooltip(l, "The 200 week moving avg has been crossed. Has only happened once.")
-//The Golden Ratio Multiplier
-//Each ATH top should kiss a line that is one down from the last ATH.
-//The next ATH should kiss the red line (350DMA * 3)
-sma350= sma(close, 350)
-sma111 = sma(close, 111)
-//plot(sma111, "SMA (close, 111)", color.lime, linewidth=3)
-//plot(sma350, "SMA (close, 350)",  color.orange, linewidth=1)
-//plot(sma350 * 1.618, "SMA350 x Golden Ratio", color.green, linewidth=2)
-//plot(sma350 * 2, "2024 ATH x 2", color.green, linewidth=1)
-//plotshape(showlabels ? sma350 * 2: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Golden Ratio 2024",  offset = offset_val, transp=100, title="Golden Ratio 2024")
-plot(sma350  * 3, "2021 ATH - Fib x3", color.yellow, linewidth=1)
-plotshape(showlabels ? sma350 * 3: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.yellow,0), show_last=1, text="Golden Ratio 2021",  offset = offset_val, transp=100, title="Golden Ratio")
-//plot(sma350  * 5, "2017 ATH - Fib x5", color.blue, linewidth=1)
-//plotshape(showlabels ? sma350 * 5: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.blue,0), show_last=1, text="Golden Ratio 2017",  offset = offset_val, transp=100, title="Golden Ratio 2017")
-//plot(sma350  * 8, "2013 ATH - Fib x8", color.teal, linewidth=1)
-//plot(sma350  * 13, "SMA350 x 13", color.aqua, linewidth=1)
-//plot(sma350  * 21, "SMA x 21", color.teal, linewidth=1)
-//Uses Pi Cyclic top to signal the ATH exits
-sma350pi= sma(close, 350)
-sma111pi = sma(close, 111)
-plot(sma350pi * 2, "pi cyclic slow", color.teal, linewidth=1)
-plotshape(showlabels ? sma350pi * 2: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.teal,0), show_last=1, text="Pi top Slow",  offset = offset_val, transp=100, title="Pi Cyclic top")
-plot(sma111pi, "pi cyclic fast", color.yellow, linewidth=1)
-plotshape(showlabels ? sma111pi: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.yellow,0), show_last=1, text="Pi top Fast",  offset = offset_val, transp=100, title="Cyclic Pi")
-if crossunder (sma350pi * 2, sma111pi)
-    l = label.new(bar_index, na)
-    label.set_text(l, text="SELL \n Pi Cycle Top \n" + tostring(close))
-    label.set_size(l, size.small)
-    label.set_color(l, color.new(color.red, 0))
-    label.set_yloc(l, yloc.abovebar)
-    label.set_style(l, label.style_labeldown)
-//Heatmap 200 Week Moving Average by Plan B
-//Historically, when we see orange and red dots assigned to the price chart,
-//this has been a good time to sell Bitcoin as the market overheats. Periods
-// where the price dots are purple and close to the 200 week MA have
-// historically been good times to buy.
-pre4weeks = sma(close, 1400)[30]
-now = sma(close, 1400)
-delta = pre4weeks - now
-deltaabs = abs(delta)
-pre = (deltaabs / pre4weeks)*100
-heatcolor = (pre >= 20 ? color.red : pre >= 15 ? color.orange : pre >= 10 ? color.yellow : pre >= 5 ? color.green : pre > 2.5 ? color.aqua : pre <= 2.5 ? color.purple : na)
-plot(pre, "testing", heatcolor, linewidth=3)
-plotshape(pre, style=shape.circle, color=heatcolor)
-plotshape(showlabels ? pre: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Heatmap 200 WMA - Plan B",  offset = offset_val, transp=100, title="Heatmap")
-if pre > 13 and pre <= 15 and sma350pi * 2 > sma111pi
-    l = label.new(bar_index, na)
-    label.set_text(l, text="Parabolic\n15%\n 200 WMA Delta")
-    label.set_size(l, size.tiny)
-    label.set_color(l, color.new(color.orange, 25))
-    label.set_yloc(l, yloc.abovebar)
-    label.set_style(l, label.style_labeldown)
-    label.delete(l[1])
-if pre > 15 and pre <= 20 and sma350pi * 2 > sma111pi
-    l = label.new(bar_index, na)
-    label.set_text(l, text="Hyper\nParabolic\n20%\n 200 WMA Delta")
-    label.set_size(l, size.tiny)
-    label.set_color(l, color.new(color.red, 25))
-    label.set_yloc(l, yloc.abovebar)
-    label.set_style(l, label.style_labeldown)
-    label.delete(l[1])
-//Diff Ribben
-//in
-div = input(1000000000, title="Position")
-//Get the data
-qu_difficulty = 'QUANDL:BCHAIN/DIFF'
-difficulty = security(qu_difficulty,'D', close[0])
-//Ribbon
-inputMVA1 = input(9,title="MA", type=input.integer, minval=1)
-res1 = input("D", type=input.resolution, title="Resolution")
-out1 = sma(difficulty/div, inputMVA1)
-inputMVA2 = input(14,title="MA", type=input.integer, minval=1)
-res2 = input("D", type=input.resolution, title="Resolution")
-out2 = sma(difficulty/div, inputMVA2)
-inputMVA3 = input(25,title="MA", type=input.integer, minval=1)
-res3 = input("D", type=input.resolution, title="Resolution")
-out3 = sma(difficulty/div, inputMVA3)
-inputMVA4 = input(40,title="MA", type=input.integer, minval=1)
-res4 = input("D", type=input.resolution, title="Resolution")
-out4 = sma(difficulty/div, inputMVA4)
-inputMVA5 = input(60,title="MA", type=input.integer, minval=1)
-res5 = input("D", type=input.resolution, title="Resolution")
-out5 = sma(difficulty/div, inputMVA5)
-inputMVA6 = input(90,title="MA", type=input.integer, minval=1)
-res6 = input("D", type=input.resolution, title="Resolution")
-out6 = sma(difficulty/div, inputMVA6)
-inputMVA7 = input(128,title="MA", type=input.integer, minval=1)
-res7 = input("D", type=input.resolution, title="Resolution")
-out7 = sma(difficulty/div, inputMVA7)
-inputMVA8 = input(200,title="MA", type=input.integer, minval=1)
-res8 = input("D", type=input.resolution, title="Resolution")
-out8 = sma(difficulty/div, inputMVA8)
-//Plot
-plot(out1, color = color.new(color.red, 50), linewidth = 1)
-plot(out2, color = color.new(color.orange, 50), linewidth = 1)
-plot(out3, color = color.new(color.yellow, 50), linewidth = 1)
-plot(out4, color = color.new(color.green, 50), linewidth = 1)
-plot(out5, color = color.new(color.aqua, 50), linewidth = 1)
-plot(out6, color = color.new(color.blue, 50), linewidth = 1)
-plot(out7, color = color.new(color.teal, 50), linewidth = 1)
-plot(out8, color = color.new(color.purple, 50), linewidth = 1)
-//Top Cap
-//Willy Woos fonund that the Avg Cap x 35 almost always hits at a ATH
-//input
-mul = input(35, title = "Multiplier")
-launchYear = input(2009, title = "Launch Year")
-launchMonth = input(01, title = "Launch Month")
-launchDay = input(03, title = "Launch Day")
-//Getting start of chart
-date = valuewhen(bar_index==0, time, 0)
-//Converting start of chart
-secondsRaw = floor(date/ 1000)
-minutesRaw = floor(secondsRaw / 60)
-hoursRaw = floor(minutesRaw / 60)
-daysRaw = floor(hoursRaw / 24)
-//Start of BTC
-startBTC = timestamp(launchYear,launchMonth,launchDay,00,00)
-secondsRawB = floor(startBTC / 1000)
-minutesRawB = floor(secondsRawB / 60)
-hoursRawB = floor(minutesRawB / 60)
-daysRawB = floor(hoursRawB / 24)
-//Calculation
-difference = daysRaw - daysRawB
-csum = mul*cum(close)/(difference+bar_index+1)
-//Plot
-plot(csum, title="Top Cap Should hit ATH", color = color.purple, linewidth = 2)
-plotshape(showlabels ? csum: na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.purple,0), show_last=1, text="Hits at ATH - Woo 35xCap",  offset = offset_val, transp=100, title="Woos top")
-////
-len_s = input(30,"Hash Rate Short SMA (days).")
-len_l = input(60,"Hash Rate Long SMA (days).")
-live_HR_short = security("QUANDL:BCHAIN/HRATE", "D", sma(close,len_s),gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
-live_HR_long = security("QUANDL:BCHAIN/HRATE", "D", sma(close,len_l),gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
-capitulation = crossover (live_HR_long, live_HR_short)
-plotshape(capitulation, color=color.new(color.red, 10), style=shape.arrowdown, location = location.abovebar, size = size.small, text="Miner\nCapitulation")
-hashIncrease = crossunder (live_HR_long, live_HR_short)
-plotshape(hashIncrease, color=color.new(color.blue, 10), style=shape.arrowup, location = location.belowbar, size = size.small, text="Miner\nIncrease")
-// HALVINGS
-plot_halvings = input(true,"Plot Halvings")
-halving_1 = timestamp(2012,11,28,0,0)
-halving_2 = timestamp(2016,7,9,0,0)
-halving_3 = timestamp(2020,5,11,0,0)
-halving_4 = timestamp(2024,3,11,0,0) // projected! https://www.bitcoinclock.com/
-h1_range = time >= halving_1 - 2*(24*60*60*1000) and time <= halving_1 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
-h2_range = time >= halving_2 - 2*(24*60*60*1000) and time <= halving_2 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
-h3_range = time >= halving_3 - 2*(24*60*60*1000) and time <= halving_3 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
-h4_range = time >= halving_4 - 2*(24*60*60*1000) and time <= halving_4 + 2*(24*60*60*1000) //adds 2 day either side for chart visibility
-bgcolor(h1_range and plot_halvings? color.red : na, transp = 20)
-bgcolor(h2_range and plot_halvings? color.red : na, transp = 20)
-bgcolor(h3_range and plot_halvings? color.red : na, transp = 20)
-bgcolor(h4_range and plot_halvings? color.red : na, transp = 20)
-//NVT Signal
-//inputs
-greenZoneTop = input(25,title="Green Zone Top")
-yellowZoneTop = input(42,title="Yellow Zone Top")
-//Get the data
-qu_transactionVolume = 'QUANDL:BCHAIN/ETRVU'
-transactionVolume = security(qu_transactionVolume,'D', close[0])
-qu_marketCap = 'QUANDL:BCHAIN/MKTCP'
-marketCap = security(qu_marketCap,'D', close[0])
-//NVT
-inputMVA111 = input(90,title="MA", type=input.integer, minval=1)
-res111 = input("D", type=input.resolution, title="Resolution")
-out111 = sma(transactionVolume, inputMVA111)
-nvt = (marketCap/out111)
-//// plot(nvt, title="NVT", color = color.new(color.lime, 0) , linewidth = 1)
-///////////////
-// INPUTS
-DarkOrLight =   input("Dark", title="Dark mode or Light mode?", options=["Dark", "Light"])
-ShowFibs =      input("Y", title="Show Fibonacci Levels?", options=["Y","N"])
-ShowExtensions= input("Y", title="Show Curve Projections?", options=["Y","N"])
-HighIntercept = input(1.06930947, title="Top Curve Intercept", step=0.001)
-HighSlope =     input(0.00076, title="Top Curve Slope", step=0.00001)
-LowIntercept =  input(-3.0269716, title="Bottom Curve Intercept", step=0.001)
-LowSlope =      input(0.001329, title="Bottom Curve Slope", step=0.00001)
-// TIME CALCS
-TimeIndex =     time < 1279670400000 ? 3.0 : (time - 1279670400000) / 86400000
-Weight =        (log10(TimeIndex + 10) * TimeIndex * TimeIndex - TimeIndex) / 30000
-TimeDelta =     time - time[1]
-// TOP OF CHANNEL INTERCEPT & SLOPE CALCS
-HighSlopeCum =  HighSlope * TimeIndex
-HighLogDev =    TimeIndex > 2 ? log(Weight) + HighIntercept + HighSlopeCum : na
-// BOTTOM OF CHANNEL INTERCEPT & SLOPE CALCS
-LowSlopeCum =   LowSlope * TimeIndex
-LowLogDev =     TimeIndex > 2 ? log(Weight) + LowIntercept + LowSlopeCum : na
-// TOTAL CHANNEL LOG RANGE
-LogRange =      HighLogDev - LowLogDev
-// FIBONACCI LEVELS
-Fib9098Calc =   (LogRange * 0.9098) + LowLogDev
-Fib8541Calc =   (LogRange * 0.8541) + LowLogDev
-Fib7639Calc =   (LogRange * 0.7639) + LowLogDev
-Fib618Calc =    (LogRange * 0.618) + LowLogDev
-MidCalc =       (LogRange * 0.5) + LowLogDev
-Fib382Calc =    (LogRange * 0.382) + LowLogDev
-Fib2361Calc =   (LogRange * 0.2361) + LowLogDev
-Fib1459Calc =   (LogRange * 0.1459) + LowLogDev
-Fib0902Calc =   (LogRange * 0.0902) + LowLogDev
-// SCALE LOG VARIABLES TO LINEAR
-HighDev =       pow(2.718281828459, HighLogDev)
-Fib9098Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib9098Calc) : na
-Fib8541Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib8541Calc) : na
-Fib7639Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib7639Calc) : na
-Fib618Dev =     ShowFibs == "Y" ? pow(2.718281828459, Fib618Calc) : na
-MidDev =        pow(2.718281828459, MidCalc)
-Fib382Dev =     ShowFibs == "Y" ? pow(2.718281828459, Fib382Calc) : na
-Fib2361Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib2361Calc) : na
-Fib1459Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib1459Calc) : na
-Fib0902Dev =    ShowFibs == "Y" ? pow(2.718281828459, Fib0902Calc) : na
-LowDev =        pow(2.718281828459, LowLogDev)
-// COLOR SCHEME
-ColorScheme =   DarkOrLight == "Dark" ? color(color.white) : color(color.black)
-// PLOTS
-plot(HighDev, color=ColorScheme, transp=0, title="100% - Top of Channel")
-//plot(Fib9098Dev, color=ColorScheme, transp=50, title="90.98% - Fibonacci Level")
-//plot(Fib8541Dev, color=ColorScheme, transp=50, title="85.41% - Fibonacci Level")
-//plot(Fib7639Dev, color=ColorScheme, transp=50, title="76.39% - Fibonacci Level")
-//plot(Fib618Dev, color=ColorScheme, transp=50, title="61.80% - Fibonacci Level")
-plot(MidDev, color=ColorScheme, transp=0, title="50% - Middle of Channel")
-//plot(Fib382Dev, color=ColorScheme, transp=50, title="38.20% - Fibonacci Level")
-//plot(Fib2361Dev, color=ColorScheme, transp=50, title="23.61% - Fibonacci Level")
-//plot(Fib1459Dev, color=ColorScheme, transp=50, title="14.59% - Fibonacci Level")
-//plot(Fib0902Dev, color=ColorScheme, transp=50, title="9.02% - Fibonacci Level")
-plot(LowDev, color=ColorScheme, transp=0, title="0% - Bottom of Channel")
-//////////////////////////////////////////////////////////
-//                                                      //
-// CURVE EXTENSION DRAWING FUNCTION & HELPER VARIABLES  //
-//                                                      //
-//////////////////////////////////////////////////////////
-// CURVE EXTENSION FUNCTION
-ExtenZe(_i, _slope, _intercept) =>
-    TI = ((time + TimeDelta *_i) -1279670400000) / 86400000
-    W = (log10(TI + 10) * TI * TI - TI) / 30000
-    HSC = _slope * TI
-    HLD = log(W) + _intercept + HSC
-    HD = pow(2.718281828459, HLD)
-    HD
-// VARIABLES FOR ADJUSTING LENGTH OF CURVE EXTENSIONS RELATIVE TO CHART TIME-FRAME
-ForLoopStep = timeframe.ismonthly == 1 ? ceil( 12 / timeframe.multiplier) :
-              timeframe.isweekly == 1 ? ceil(26 / timeframe.multiplier) :
-              timeframe.isdaily == 1 ? ceil(91 / timeframe.multiplier) :
-              (timeframe.isminutes == 1) and (timeframe.multiplier > 59) ? ceil(10080 / timeframe.multiplier) : na
-ForLoopMax =    na(ForLoopStep) ? na : ForLoopStep * 13
-// MID CURVE SLOPE & INTERCEPT
-MidSlope =      (HighSlope + LowSlope) * 0.5
-MidIntercept =  (HighIntercept + LowIntercept) * 0.5
-// CHECK IF LAST BAR & "Show Curve Projections" IS CHECKED, THEN DRAW CURVE EXTENZES
-if barstate.islast and ShowExtensions == "Y"
-    for i = 0 to ForLoopMax-1 by ForLoopStep
-        line.new(time + TimeDelta * i, ExtenZe(i, HighSlope, HighIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, HighSlope, HighIntercept), xloc=xloc.bar_time, color=ColorScheme)
-        line.new(time + TimeDelta * i, ExtenZe(i, LowSlope, LowIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, LowSlope, LowIntercept), xloc=xloc.bar_time, color=ColorScheme)
-        line.new(time + TimeDelta * i, ExtenZe(i, MidSlope, MidIntercept), time + TimeDelta * (i + ForLoopStep), ExtenZe(i + ForLoopStep, MidSlope, MidIntercept), xloc=xloc.bar_time, color=ColorScheme)
-////// Buy when price dips under log channel. Sell when channel top is broken
-if crossover (LowDev, low)
-    l = label.new(bar_index, na)
-    label.set_text(l, text="BUY\n" + tostring(low))
-    label.set_size(l, size.small)
-    label.set_color(l, color.new(color.lime, 0))
-    label.set_yloc(l, yloc.belowbar)
-    label.set_style(l, label.style_labelup)
-if crossunder (HighDev, high)
-    l = label.new(bar_index, na)
-    label.set_text(l, text="SELL \n Broke log channel \n" + tostring(high))
-    label.set_size(l, size.small)
-    label.set_color(l, color.new(color.red, 0))
-    label.set_yloc(l, yloc.abovebar)
-    label.set_style(l, label.style_labeldown)
-//////////////////////////////////////// SAR
-// SAR #1
-// Lucid Sar
-// Branded under the name "Lucid SAR"
-// as agreed to with Lucid Investment Strategies LLC on July 9, 2019
-// https://lucidinvestmentstrategies.com/
-// SAR #2
-// Peterbolic Sar
-// Using the name "Peterbolic SAR"
-// as agreed to by Peter Brandt on October 2, 2019
-// - https://twitter.com/PeterLBrandt/status/1179365590668075008
-// in response to request from Sawcruhteez
-// - https://twitter.com/Sawcruhteez/status/1179213105705836544
-// Sawcruhteez gives credit to @CrazyGabey for coming up with the name
-// - https://twitter.com/Sawcruhteez/status/1179213196583940097
-// SAR #3
-// Sawcruhteez Sar
-// Branded under the name "Sawcruhteez SAR"
-// as agreed to Sawcruhteez on September 11, 2019
-// Open Source on github
-// https://github.com/casey-bowman/sar
-// Created by Casey Bowman on July 4, 2019
+//@version=6
+indicator("My Super Script", overlay = true, max_labels_count = 200, max_lines_count = 39)
+
+// Price averages use chart bars, as in the original study. Use a 1D Bitcoin
+// chart for the intended day counts. Mining averages always use daily data.
+const int DAY_MS = 86400000
+const string DISPLAY_GROUP = "Display and signals"
+const string MINING_GROUP = "Bitcoin mining"
+const string DIFFICULTY_GROUP = "Difficulty ribbon"
+const string CHANNEL_GROUP = "Logarithmic channel"
+const string SAR_GROUP = "Lucid SAR"
+const string GUPPY_GROUP = "Guppy in one line"
+
+showLabels = input.bool(true, "Show end labels", group = DISPLAY_GROUP)
+labelOffset = input.int(8, "End label offset (bars)", minval = -500, maxval = 500, group = DISPLAY_GROUP)
+confirmSignals = input.bool(true, "Confirm price signals at bar close", group = DISPLAY_GROUP)
+showHalvings = input.bool(true, "Shade Bitcoin halvings", group = DISPLAY_GROUP)
+signalReady = not confirmSignals or barstate.isconfirmed
+labelBackground = color.new(color.black, 100)
+
+priceLabel(string caption, float price, color background, bool below, string description = "") =>
+    label.new(bar_index, price, caption + "\n" + str.tostring(price, format.mintick),
+         yloc = below ? yloc.belowbar : yloc.abovebar,
+         style = below ? label.style_label_up : label.style_label_down,
+         color = background, textcolor = color.white, size = size.small, tooltip = description)
+
+// 2-Year Moving Average Multiplier
+twoYearAverage = ta.sma(close, 730)
+twoYearUpper = twoYearAverage * 5.0
+priceAnchor = plot(close, "Price fill anchor", display = display.none)
+investorLower = plot(twoYearAverage, "2-Year MA", display = display.none)
+investorUpper = plot(twoYearUpper, "2-Year MA ×5", display = display.none)
+fill(investorLower, priceAnchor, open <= twoYearAverage ? color.new(color.green, 75) : na, title = "2-Year MA lower zone", fillgaps = false)
+fill(investorUpper, priceAnchor, open >= twoYearUpper ? color.new(color.red, 75) : na, title = "2-Year MA upper zone", fillgaps = false)
+upperBandCross = ta.crossover(close, twoYearUpper)
+upperBandSignal = signalReady and upperBandCross
+plotshape(upperBandSignal, "2-Year MA ×5 breakout", shape.arrowdown, location.abovebar,
+     color.new(color.red, 10), text = "Above\n2Y MA ×5", textcolor = color.red, size = size.small)
+
+// 200 Week Moving Average and 30-bar heatmap
+wma200 = ta.sma(close, 1400)
+plot(wma200, "200 Week MA", color.white)
+plotshape(showLabels ? wma200 : na, "200 WMA end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "200 WMA", textcolor = color.white, show_last = 1)
+wmaDip = ta.crossunder(low, wma200)
+wmaDipSignal = signalReady and wmaDip
+if wmaDipSignal
+    priceLabel("BUY · 200 WMA", low, color.blue, true, "The candle low crossed below the 200 Week MA.")
+
+// Pi Cycle Top and Golden Ratio Multiplier share the 350-bar average.
+sma350 = ta.sma(close, 350)
+goldenRatio = sma350 * 3.0
+piSlow = sma350 * 2.0
+piFast = ta.sma(close, 111)
+plot(goldenRatio, "Golden Ratio Multiplier (350 MA ×3)", color.yellow)
+plot(piSlow, "Pi Cycle Top slow (350 MA ×2)", color.teal)
+plot(piFast, "Pi Cycle Top fast (111 MA)", color.yellow)
+plotshape(showLabels ? goldenRatio : na, "Golden Ratio end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "Golden Ratio 2021", textcolor = color.yellow, show_last = 1)
+plotshape(showLabels ? piSlow : na, "Pi Cycle slow end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "Pi Top Slow", textcolor = color.teal, show_last = 1)
+plotshape(showLabels ? piFast : na, "Pi Cycle fast end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "Pi Top Fast", textcolor = color.yellow, show_last = 1)
+piCross = ta.crossover(piFast, piSlow)
+piSignal = signalReady and piCross
+if piSignal
+    priceLabel("SELL · Pi Cycle Top", close, color.red, false)
+
+previousWma = wma200[30]
+wmaChange = previousWma > 0 ? math.abs(wma200 - previousWma) / previousWma * 100.0 : na
+heatColor(float change) =>
+    switch
+        na(change) => color(na)
+        change >= 20 => color.red
+        change >= 15 => color.orange
+        change >= 10 => color.yellow
+        change >= 5 => color.green
+        change > 2.5 => color.aqua
+        => color.purple
+
+plot(wmaChange, "200 WMA absolute change (%)", display = display.data_window)
+plotshape(not na(wmaChange), "200 WMA heatmap", shape.circle, location.abovebar,
+     heatColor(wmaChange), size = size.tiny)
+var label parabolicLabel = na
+var label hyperParabolicLabel = na
+if signalReady and piSlow > piFast
+    if wmaChange > 13 and wmaChange <= 15
+        label.delete(parabolicLabel)
+        parabolicLabel := label.new(bar_index, high, "Parabolic\n200 WMA Δ " + str.tostring(wmaChange, "#.0") + "%",
+             yloc = yloc.abovebar, style = label.style_label_down, color = color.new(color.orange, 25), size = size.tiny)
+    if wmaChange > 15 and wmaChange <= 20
+        label.delete(hyperParabolicLabel)
+        hyperParabolicLabel := label.new(bar_index, high, "Hyper Parabolic\n200 WMA Δ " + str.tostring(wmaChange, "#.0") + "%",
+             yloc = yloc.abovebar, style = label.style_label_down, color = color.new(color.red, 25),
+             textcolor = color.white, size = size.tiny)
+
+// Difficulty and hash-rate calculations run inside their daily feeds. The one-day
+// offset means only completed source days affect the plots and miner crossings.
+showDifficulty = input.bool(true, "Show difficulty ribbon", group = MINING_GROUP)
+showMinerSignals = input.bool(true, "Show miner signals", group = MINING_GROUP)
+difficultySymbol = input.symbol("BCHAIN:DIFF", "Difficulty symbol", group = MINING_GROUP)
+hashRateSymbol = input.symbol("BCHAIN:HRATE", "Hash rate symbol", group = MINING_GROUP)
+hashShortLength = input.int(30, "Short hash-rate SMA (days)", minval = 1, group = MINING_GROUP)
+hashLongLength = input.int(60, "Long hash-rate SMA (days)", minval = 1, group = MINING_GROUP)
+difficultyDivisor = input.float(1e9, "Difficulty scale divisor", minval = 1.0, group = DIFFICULTY_GROUP)
+diffLength1 = input.int(9, "SMA 1 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength2 = input.int(14, "SMA 2 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength3 = input.int(25, "SMA 3 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength4 = input.int(40, "SMA 4 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength5 = input.int(60, "SMA 5 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength6 = input.int(90, "SMA 6 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength7 = input.int(128, "SMA 7 (days)", minval = 1, group = DIFFICULTY_GROUP)
+diffLength8 = input.int(200, "SMA 8 (days)", minval = 1, group = DIFFICULTY_GROUP)
+
+dailyDifficulty() =>
+    scaled = close / difficultyDivisor
+    [ta.sma(scaled, diffLength1)[1], ta.sma(scaled, diffLength2)[1],
+     ta.sma(scaled, diffLength3)[1], ta.sma(scaled, diffLength4)[1],
+     ta.sma(scaled, diffLength5)[1], ta.sma(scaled, diffLength6)[1],
+     ta.sma(scaled, diffLength7)[1], ta.sma(scaled, diffLength8)[1], time_close[1]]
+
+dailyMinerEvents() =>
+    shortAverage = ta.sma(close, hashShortLength)
+    longAverage = ta.sma(close, hashLongLength)
+    crossedBelow = ta.crossunder(shortAverage, longAverage)
+    crossedAbove = ta.crossover(shortAverage, longAverage)
+    // Carry the latest matching event so a weekly/monthly bar can show a
+    // crossing even if it did not occur on the sampled final daily bar.
+    [ta.valuewhen(crossedBelow[1], time, 0), ta.valuewhen(crossedAbove[1], time, 0), time_close[1]]
+
+chartSeconds = timeframe.in_seconds()
+dailyLookahead = chartSeconds > 86400 ? barmerge.lookahead_off : barmerge.lookahead_on
+[difficulty1, difficulty2, difficulty3, difficulty4, difficulty5, difficulty6, difficulty7, difficulty8, difficultyAsOf] =
+     request.security(difficultySymbol, "1D", dailyDifficulty(), lookahead = dailyLookahead, ignore_invalid_symbol = true)
+[minerCapitulationTime, minerIncreaseTime, hashRateAsOf] =
+     request.security(hashRateSymbol, "1D", dailyMinerEvents(), lookahead = dailyLookahead, ignore_invalid_symbol = true)
+
+plot(showDifficulty ? difficulty1 : na, "Difficulty ribbon 1", color.new(color.red, 50))
+plot(showDifficulty ? difficulty2 : na, "Difficulty ribbon 2", color.new(color.orange, 50))
+plot(showDifficulty ? difficulty3 : na, "Difficulty ribbon 3", color.new(color.yellow, 50))
+plot(showDifficulty ? difficulty4 : na, "Difficulty ribbon 4", color.new(color.green, 50))
+plot(showDifficulty ? difficulty5 : na, "Difficulty ribbon 5", color.new(color.aqua, 50))
+plot(showDifficulty ? difficulty6 : na, "Difficulty ribbon 6", color.new(color.blue, 50))
+plot(showDifficulty ? difficulty7 : na, "Difficulty ribbon 7", color.new(color.teal, 50))
+plot(showDifficulty ? difficulty8 : na, "Difficulty ribbon 8", color.new(color.purple, 50))
+
+eventInBar(int eventTime) =>
+    not na(eventTime) and not na(time_close) and eventTime >= time and eventTime < time_close
+
+minerCapitulation = showMinerSignals and barstate.isconfirmed and eventInBar(minerCapitulationTime)
+minerIncrease = showMinerSignals and barstate.isconfirmed and eventInBar(minerIncreaseTime)
+plotshape(minerCapitulation, "Miner Capitulation", shape.arrowdown, location.abovebar,
+     color.new(color.red, 10), text = "Miner\nCapitulation", textcolor = color.red, size = size.small)
+plotshape(minerIncrease, "Miner Increase", shape.arrowup, location.belowbar,
+     color.new(color.blue, 10), text = "Miner\nIncrease", textcolor = color.rgb(33, 150, 243), size = size.small)
+
+var table miningStatus = table.new(position.top_right, 1, 2)
+feedStatus(int asOf, string name) =>
+    if na(asOf)
+        name + ": no daily data"
+    else if time - asOf > 7 * DAY_MS
+        name + ": last confirmed " + str.format_time(asOf, "yyyy-MM-dd", "UTC")
+    else
+        ""
+
+if barstate.islast
+    difficultyStatus = showDifficulty ? feedStatus(difficultyAsOf, "Mining difficulty") : ""
+    hashStatus = showMinerSignals ? feedStatus(hashRateAsOf, "Hash rate") : ""
+    table.clear(miningStatus, 0, 0, 0, 1)
+    if difficultyStatus != ""
+        table.cell(miningStatus, 0, 0, difficultyStatus, text_color = color.white, bgcolor = color.new(color.orange, 60))
+    if hashStatus != ""
+        table.cell(miningStatus, 0, 1, hashStatus, text_color = color.white, bgcolor = color.new(color.orange, 60))
+
+// Woo Top Cap proxy. Its denominator includes elapsed days before loaded chart
+// history, so this copy of the original formula is intended for the daily chart.
+topCapMultiple = input.float(35, "Multiplier", minval = 0.01, group = "Woo Top Cap")
+genesisDate = input.time(timestamp("03 Jan 2009 00:00 +0000"), "Bitcoin launch date", group = "Woo Top Cap")
+var int daysBeforeHistory = math.floor(time / float(DAY_MS)) - math.floor(genesisDate / float(DAY_MS))
+topCapCount = daysBeforeHistory + bar_index + 1
+totalClosingPrices = ta.cum(close)
+topCap = topCapCount > 0 ? topCapMultiple * totalClosingPrices / topCapCount : na
+plot(topCap, "Woo Top Cap proxy", color.purple, linewidth = 2)
+plotshape(showLabels ? topCap : na, "Woo Top Cap end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "Woo Top Cap", textcolor = color.purple, show_last = 1)
+
+// Halving days in UTC. Shade each candle whose time span overlaps the window.
+halvingWindow(int halvingDay) =>
+    time < halvingDay + 3 * DAY_MS and nz(time_close, time + 1) > halvingDay - 2 * DAY_MS
+
+halvingBar = halvingWindow(timestamp("28 Nov 2012 00:00 +0000")) or
+     halvingWindow(timestamp("09 Jul 2016 00:00 +0000")) or
+     halvingWindow(timestamp("11 May 2020 00:00 +0000")) or
+     halvingWindow(timestamp("20 Apr 2024 00:00 +0000"))
+bgcolor(showHalvings and halvingBar ? color.new(color.red, 80) : na, title = "Bitcoin halving window")
+
+// Logarithmic price channel. Interpolate Fibonacci levels in log space.
+curveTheme = input.string("Dark", "Chart theme", options = ["Dark", "Light"], group = CHANNEL_GROUP)
+showFibs = input.bool(false, "Show additional Fibonacci levels", group = CHANNEL_GROUP)
+showProjections = input.bool(true, "Show curve projections", group = CHANNEL_GROUP)
+highIntercept = input.float(1.06930947, "Top curve intercept", step = 0.001, group = CHANNEL_GROUP)
+highSlope = input.float(0.00076, "Top curve slope", step = 0.00001, group = CHANNEL_GROUP)
+lowIntercept = input.float(-3.0269716, "Bottom curve intercept", step = 0.001, group = CHANNEL_GROUP)
+lowSlope = input.float(0.001329, "Bottom curve slope", step = 0.00001, group = CHANNEL_GROUP)
+const int CHANNEL_ORIGIN = 1279670400000
+
+logChannel(int atTime) =>
+    day = atTime < CHANNEL_ORIGIN ? 3.0 : (atTime - CHANNEL_ORIGIN) / float(DAY_MS)
+    weight = (math.log10(day + 10) * day * day - day) / 30000
+    logWeight = day > 2 ? math.log(weight) : na
+    [logWeight + lowIntercept + lowSlope * day, logWeight + highIntercept + highSlope * day]
+
+channelLevel(float lowerLog, float upperLog, float ratio) =>
+    math.exp(lowerLog + (upperLog - lowerLog) * ratio)
+
+[lowerLog, upperLog] = logChannel(time)
+channelHigh = math.exp(upperLog)
+channelLow = math.exp(lowerLog)
+channelMid = channelLevel(lowerLog, upperLog, 0.5)
+channelColor = curveTheme == "Dark" ? color.white : color.black
+fibColor = color.new(channelColor, 50)
+plot(channelHigh, "Log channel top", channelColor)
+plot(channelMid, "Log channel middle", channelColor)
+plot(channelLow, "Log channel bottom", channelColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.9098) : na, "Log channel 90.98%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.8541) : na, "Log channel 85.41%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.7639) : na, "Log channel 76.39%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.618) : na, "Log channel 61.80%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.382) : na, "Log channel 38.20%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.2361) : na, "Log channel 23.61%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.1459) : na, "Log channel 14.59%", fibColor)
+plot(showFibs ? channelLevel(lowerLog, upperLog, 0.0902) : na, "Log channel 9.02%", fibColor)
+
+const int PROJECTION_SEGMENTS = 13
+projectionDays = switch
+    timeframe.ismonthly => 365
+    timeframe.isweekly => 182
+    timeframe.isdaily => 91
+    timeframe.isminutes and chartSeconds >= 3600 => 7
+    => 0
+
+// Reuse the same lines each time the chart updates. Fixed calendar intervals
+// keep a gap between traded bars from lengthening the projection.
+var array<line> projectionLines = array.new<line>()
+if barstate.isfirst and showProjections and projectionDays > 0
+    for index = 0 to PROJECTION_SEGMENTS * 3 - 1
+        projectionLines.push(line.new(na, na, na, na, xloc = xloc.bar_time, color = channelColor))
+
+updateSegment(line segment, int start, float startPrice, int finish, float finishPrice) =>
+    line.set_xy1(segment, start, startPrice)
+    line.set_xy2(segment, finish, finishPrice)
+
+if barstate.islast and array.size(projectionLines) > 0
+    for index = 0 to PROJECTION_SEGMENTS - 1
+        segmentStart = time + projectionDays * DAY_MS * index
+        segmentEnd = segmentStart + projectionDays * DAY_MS
+        [startLow, startHigh] = logChannel(segmentStart)
+        [endLow, endHigh] = logChannel(segmentEnd)
+        lineIndex = index * 3
+        updateSegment(projectionLines.get(lineIndex), segmentStart, math.exp(startLow), segmentEnd, math.exp(endLow))
+        updateSegment(projectionLines.get(lineIndex + 1), segmentStart, channelLevel(startLow, startHigh, 0.5),
+             segmentEnd, channelLevel(endLow, endHigh, 0.5))
+        updateSegment(projectionLines.get(lineIndex + 2), segmentStart, math.exp(startHigh), segmentEnd, math.exp(endHigh))
+
+channelLowCross = ta.crossunder(low, channelLow)
+channelHighCross = ta.crossover(high, channelHigh)
+channelLowSignal = signalReady and channelLowCross
+channelHighSignal = signalReady and channelHighCross
+if channelLowSignal
+    priceLabel("BUY · Log Channel", low, color.green, true)
+if channelHighSignal
+    priceLabel("SELL · Log Channel", high, color.red, false)
+
+// Lucid SAR by Casey Bowman (2019). Source: https://github.com/casey-bowman/sar
 // MIT License
+//
 // Copyright (c) 2019 Casey Bowman
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -330,99 +290,61 @@ if crossunder (HighDev, high)
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-AF_initial = input(0.00285714)
-AF_increment = input(0.0014)
-AF_maximum = input(0.2)
-LUCID_SAR(initial, increment, maximum) =>
-    // start with uptrend
-    uptrend = true
-    new_trend = false
-    EP = high
-    SAR = low
-    AF = AF_initial
-    // before a reversal, the reversal_state is 0;
-    // after a reversal, within the same candle as the reversal,
-    // the reversal_state can be 1 (uptrend) or 2 (downtrend)
-    reversal_state = 0
-    if not na(uptrend[1]) and not na(new_trend[1])
-        if reversal_state == 0
-            if uptrend[1]
-                EP := max(high, EP[1])
-            else
-                EP := min(low, EP[1])
-            if new_trend[1]
-                AF := AF_initial
-            else
-                if EP != EP[1]
-                    AF := min(AF_maximum, AF[1] + AF_increment)
-                else
-                    AF := AF[1]
-            SAR := SAR[1] + AF * (EP - SAR[1])
-            if uptrend[1]
-                SAR := min(SAR, low[1])
-                if not na(low[2])
-                    SAR := min(SAR, low[2])
-                if SAR > low
-                    uptrend := false
-                    new_trend := true
-                    SAR := max(high, EP[1])
-                    EP := min(low, low[1])
-                    reversal_state := 2
-                else
-                    uptrend := true
-                    new_trend := false
-            else
-                SAR := max(SAR, high[1])
-                if not na(high[2])
-                    SAR := max(SAR, high[2])
-                if SAR < high
-                    uptrend := true
-                    new_trend := true
-                    SAR := min(low, EP[1])
-                    EP := max(high, high[1])
-                    reversal_state := 1
-                else
-                    uptrend := false
-                    new_trend := false
+sarInitial = input.float(0.00285714, "Initial acceleration", minval = 0, group = SAR_GROUP)
+sarIncrement = input.float(0.0014, "Acceleration step", minval = 0, group = SAR_GROUP)
+sarMaximum = input.float(0.2, "Maximum acceleration", minval = 0, group = SAR_GROUP)
+
+lucidSar(float initial, float increment, float maximum) =>
+    bool uptrend = true
+    bool reversed = false
+    float extreme = high
+    float acceleration = initial
+    float sar = low
+
+    // Preserve Lucid SAR's original acceleration order and reversal rules.
+    if not na(sar[1])
+        uptrend := uptrend[1]
+        extreme := uptrend ? math.max(high, extreme[1]) : math.min(low, extreme[1])
+        acceleration := reversed[1] ? initial : acceleration[1]
+        if not reversed[1] and extreme != extreme[1]
+            acceleration := math.min(maximum, acceleration + increment)
+        sar := sar[1] + acceleration * (extreme - sar[1])
+        if uptrend
+            sar := math.min(sar, low[1], nz(low[2], low[1]))
+            if sar > low
+                uptrend := false
+                reversed := true
+                sar := math.max(high, extreme[1])
+                extreme := math.min(low, low[1])
         else
-            if reversal_state == 1
-                EP := high
-                if low < SAR
-                    SAR := EP
-                    EP := low
-                    reversal_state == 2
-                    uptrend := false
-            else
-                EP := low
-                if high > SAR
-                    SAR := EP
-                    EP := high
-                    reversal_state == 1
-                    uptrend := true
-    SAR
-L_SAR = LUCID_SAR(AF_initial, AF_increment, AF_maximum)
-plot(L_SAR, color = color.blue, style = plot.style_cross, linewidth = 2)
-/////////////////////////////////// ///////////////////7
-// Guppy but all condenced into a single line. Gray is bad and green is good.
-src = close,
-//Slow EMA
-len7 = input(30, minval=1, title="Slow EMA 7")
-len8 = input(35, minval=1, title="Slow EMA 8")
-len9 = input(40, minval=1, title="Slow EMA 9")
-len10 = input(45, minval=1, title="Slow EMA 10")
-len11 = input(50, minval=1, title="Slow EMA 11")
-len12 = input(60, minval=1, title="Slow EMA 12")
-//Slow EMA
-ema7 = ema(src, len7)
-ema8 = ema(src, len8)
-ema9 = ema(src, len9)
-ema10 = ema(src, len10)
-ema11 = ema(src, len11)
-ema12 = ema(src, len12)
-//Slow EMA Color Rules
-colslowL = ema7 > ema8 and ema8 > ema9 and ema9 > ema10 and ema10 > ema11 and ema11 > ema12 // makes green
-colslowS = ema7 < ema8 and ema8 < ema9 and ema9 < ema10 and ema10 < ema11 and ema11 < ema12 // makes orange
-//Slow EMA Final Color Rules
-colFinal2 = colslowL  ? color.lime : colslowS ? na : color.orange
-plot(ema12, color=colFinal2, style = plot.style_cross, linewidth = 1)
-plotshape(showlabels ? ema12 : na, style=shape.labeldown, location=location.absolute, color=color.purple,  textcolor=color.new(color.green,0), show_last=1, text="Guppy in 1 line.",  offset = offset_val, transp=100, title="Full Guppy in 1 line")
+            sar := math.max(sar, high[1], nz(high[2], high[1]))
+            if sar < high
+                uptrend := true
+                reversed := true
+                sar := math.min(low, extreme[1])
+                extreme := math.max(high, high[1])
+    sar
+
+plot(lucidSar(sarInitial, sarIncrement, sarMaximum), "Lucid SAR", color.blue, linewidth = 2, style = plot.style_cross)
+
+// Guppy: draw the slowest EMA and color it by the order of the six averages.
+guppy1 = ta.ema(close, input.int(30, "EMA 1", minval = 1, group = GUPPY_GROUP))
+guppy2 = ta.ema(close, input.int(35, "EMA 2", minval = 1, group = GUPPY_GROUP))
+guppy3 = ta.ema(close, input.int(40, "EMA 3", minval = 1, group = GUPPY_GROUP))
+guppy4 = ta.ema(close, input.int(45, "EMA 4", minval = 1, group = GUPPY_GROUP))
+guppy5 = ta.ema(close, input.int(50, "EMA 5", minval = 1, group = GUPPY_GROUP))
+guppy6 = ta.ema(close, input.int(60, "EMA 6", minval = 1, group = GUPPY_GROUP))
+guppyUp = guppy1 > guppy2 and guppy2 > guppy3 and guppy3 > guppy4 and guppy4 > guppy5 and guppy5 > guppy6
+guppyDown = guppy1 < guppy2 and guppy2 < guppy3 and guppy3 < guppy4 and guppy4 < guppy5 and guppy5 < guppy6
+plot(guppyDown ? na : guppy6, "Guppy in one line", guppyUp ? color.lime : color.orange, style = plot.style_cross)
+plotshape(showLabels ? guppy6 : na, "Guppy end label", shape.labeldown, location.absolute,
+     labelBackground, offset = labelOffset, text = "Guppy in 1 line", textcolor = color.green, show_last = 1)
+
+// Expose the chart events in TradingView's Create Alert dialog.
+alertcondition(upperBandSignal, "2-Year MA ×5 breakout", "{{ticker}} crossed above the 2-Year MA ×5 band.")
+alertcondition(wmaDipSignal, "200 WMA dip", "{{ticker}} low crossed below the 200 Week MA.")
+alertcondition(piSignal, "Pi Cycle Top", "{{ticker}} fast Pi Cycle average crossed above the slow average.")
+alertcondition(channelLowSignal, "Log channel low break", "{{ticker}} low crossed below the logarithmic channel.")
+alertcondition(channelHighSignal, "Log channel high break", "{{ticker}} high crossed above the logarithmic channel.")
+alertcondition(minerCapitulation, "Miner Capitulation", "Bitcoin short daily hash-rate SMA crossed below the long SMA.")
+alertcondition(minerIncrease, "Miner Increase", "Bitcoin short daily hash-rate SMA crossed above the long SMA.")

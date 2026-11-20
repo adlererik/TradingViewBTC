@@ -1,6 +1,6 @@
 # TradingViewBTC
 
-TradingViewBTC is a small Android app for watching Bitcoin’s price in US dollars. It puts 12 chart overlays together in one view, from simple trend lines to Bitcoin-specific mining and market-cycle indicators. It is based on the original Pine Script v4 study, [My Super Script](reference/my-super-script.pine), with the calculations ported to JavaScript.
+TradingViewBTC is a small Android app for watching Bitcoin’s price in US dollars. It puts 12 chart overlays together in one view, from simple trend lines to Bitcoin-specific mining and market-cycle indicators. The Android app ports the calculations from the original Pine study, My Super Script, to JavaScript.
 
 [Download the Android APK](https://github.com/adlererik/TradingViewBTC/releases/latest) · [Read the indicator guide](INDICATORS.md)
 
@@ -29,6 +29,14 @@ The APK is signed for direct installation. It uses the same signing certificate 
 Bitstamp supplies BTC/USD candles and trades. While the app is visible, new trades can update the price and current candle up to once per second. The app refreshes recent candles through the Bitstamp HTTP API about every 30 seconds and caches history locally. Mempool.space supplies network difficulty and estimated Bitcoin mining hash rate in place of the original Quandl feeds. The chart uses UTC. [Bitstamp API](https://www.bitstamp.net/api/) · [Bitstamp WebSocket](https://www.bitstamp.net/websocket/v2/) · [Mempool mining dashboard](https://mempool.space/mining)
 
 The interval picker runs from **1m** to **1M**. Most moving averages count candles on the selected interval. The **200 Week MA** is a 1,400-candle average and represents about 200 weeks on **1D**. The app fetches daily and three-day history in stages and up to 3,500 bars per intraday interval. A long average appears when sufficient history has loaded. Weekly candles start Monday and monthly candles use calendar months.
+
+## Use the Pine script on TradingView
+
+1. Open a daily Bitcoin chart such as **BITSTAMP:BTCUSD** on **1D**.
+2. Copy [My Super Script (Pine v6)](reference/my-super-script.pine) into TradingView’s **Pine Editor** and select **Add to chart**. [TradingView’s Pine Editor guide](https://www.tradingview.com/support/solutions/43000763320-how-to-work-with-pine-editor/)
+3. Use the indicator settings to change labels, curve projections, and mining symbols. The defaults are `BCHAIN:DIFF` for difficulty and `BCHAIN:HRATE` for hash rate. The script flags missing or stale feed data and bases mining markers on completed daily data.
+
+The Pine edition shades the actual fourth halving date, April 20, 2024, and waits for the candle to close before marking price signals by default. Its chart events are available in TradingView’s **Create Alert** dialog.
 
 ## Build from source
 
