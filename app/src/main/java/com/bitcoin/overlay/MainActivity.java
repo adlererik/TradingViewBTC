@@ -1,9 +1,12 @@
 package com.bitcoin.overlay;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.view.View;
@@ -12,6 +15,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,11 +31,11 @@ public final class MainActivity extends Activity {
     private static final String HOME = "https://" + HOST + "/index.html";
     private static final String PRICE = "https://www.bitstamp.net/api/v2/ohlc/btcusd/";
     private static final String MINING = "https://mempool.space/api/v1/mining/hashrate/all";
+    private static final String REPOSITORY = "https://github.com/adlererik/TradingViewBTC";
     private WebView webView;
     private String homeUrl;
 
     @Override
-    @SuppressWarnings("deprecation")
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         webView = new WebView(this);
@@ -42,27 +47,43 @@ public final class MainActivity extends Activity {
         webView.getSettings().setTextZoom(100);
         webView.setWebViewClient(new LocalClient());
 
-        if (android.os.Build.VERSION.SDK_INT >= 35) {
-            webView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-                @Override
-                public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
-                    android.graphics.Insets edges = insets.getInsets(
-                        WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
-                    view.setPadding(edges.left, edges.top, edges.right, edges.bottom);
-                    return insets;
-                }
-            });
-        } else {
-            getWindow().setStatusBarColor(Color.rgb(13, 17, 23));
-            getWindow().setNavigationBarColor(Color.rgb(13, 17, 23));
-            getWindow().getDecorView().setSystemUiVisibility(0);
-        }
-        setContentView(webView);
-        webView.requestApplyInsets();
+        setContentBelowSystemBars(this, webView);
         LocaleList locales = Resources.getSystem().getConfiguration().getLocales();
         String language = locales.isEmpty() ? "en" : locales.get(0).getLanguage();
         homeUrl = Uri.parse(HOME).buildUpon().appendQueryParameter("lang", language).build().toString();
         webView.loadUrl(homeUrl);
+    }
+
+    @SuppressWarnings("deprecation")
+    static void setContentBelowSystemBars(Activity activity, View content) {
+        int background = Color.rgb(13, 17, 23);
+        if (Build.VERSION.SDK_INT >= 35) {
+            activity.getWindow().setDecorFitsSystemWindows(false);
+            android.view.WindowInsetsController controller = activity.getWindow().getInsetsController();
+            if (controller != null) {
+                controller.setSystemBarsAppearance(0,
+                    android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            }
+            // Inset the WebView's viewport itself rather than padding within it.
+            FrameLayout safeArea = new FrameLayout(activity);
+            safeArea.setBackgroundColor(background);
+            safeArea.addView(content, new FrameLayout.LayoutParams(-1, -1));
+            safeArea.setOnApplyWindowInsetsListener((view, insets) -> {
+                android.graphics.Insets edges = insets.getInsetsIgnoringVisibility(
+                    WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                int ime = insets.getInsets(WindowInsets.Type.ime()).bottom;
+                view.setPadding(edges.left, edges.top, edges.right, Math.max(edges.bottom, ime));
+                return WindowInsets.CONSUMED;
+            });
+            activity.setContentView(safeArea);
+            safeArea.post(safeArea::requestApplyInsets);
+        } else {
+            activity.getWindow().setStatusBarColor(background);
+            activity.getWindow().setNavigationBarColor(background);
+            activity.getWindow().getDecorView().setSystemUiVisibility(0);
+            activity.setContentView(content);
+        }
     }
 
     @Override
@@ -78,7 +99,22 @@ public final class MainActivity extends Activity {
     private final class LocalClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            return !homeUrl.equals(request.getUrl().toString());
+            Uri uri = request.getUrl();
+            if (!request.isForMainFrame()) return true;
+            if (homeUrl.equals(uri.toString())) return false;
+            if (request.hasGesture() && "https".equals(uri.getScheme())) {
+                if (HOST.equals(uri.getHost()) && "/price-alert".equals(uri.getPath())) {
+                    startActivity(new Intent(MainActivity.this, PriceAlertActivity.class)
+                        .putExtra("swedish", "sv".equals(uri.getQueryParameter("lang"))));
+                } else if (REPOSITORY.equals(uri.toString())) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY)));
+                    } catch (ActivityNotFoundException unavailable) {
+                        Toast.makeText(MainActivity.this, REPOSITORY, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            return true;
         }
 
         @Override

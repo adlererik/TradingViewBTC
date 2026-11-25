@@ -9,7 +9,7 @@
 [hidden] { display:none !important }
 body { margin:0; overflow:hidden }
 button { font:inherit; color:inherit; cursor:pointer; background:none; border:0; padding:0; -webkit-tap-highlight-color:transparent }
-button:focus-visible, input:focus-visible, canvas:focus-visible { outline:1px solid var(--accent); outline-offset:-2px }
+a:focus-visible, button:focus-visible, input:focus-visible, canvas:focus-visible { outline:1px solid var(--accent); outline-offset:-2px }
 svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
 .shell { max-width:1440px; margin:auto; height:100vh; height:100dvh; min-height:260px; padding:0 clamp(12px,2.5vw,38px); display:flex; flex-direction:column }
 .top { display:flex; align-items:center; min-height:71px; gap:15px; border-bottom:1px solid var(--border) }
@@ -36,9 +36,10 @@ button[aria-pressed="true"] { color:var(--accent); background:#b2f15813 }
 .panel { min-height:0; flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--panel); border:1px solid var(--border); border-radius:11px }
 .panel-head { display:flex; min-height:40px; justify-content:space-between; align-items:center; padding:0 12px }
 .script { display:flex; align-items:center; gap:8px; min-width:0 }
-.script h2 { font-size:13px; font-weight:650; white-space:nowrap }
-.script-dot { width:6px; height:6px; border-radius:50%; background:var(--accent) }
-#active-interval { color:var(--muted); font:11px ui-monospace,monospace; border-left:1px solid var(--border); padding-left:8px }
+.script h2 { min-width:0; overflow:hidden; text-overflow:ellipsis; font-size:13px; font-weight:650; white-space:nowrap }
+.script a { color:inherit; text-decoration:underline; text-underline-offset:3px }
+.script-dot { flex:none; width:6px; height:6px; border-radius:50%; background:var(--accent) }
+#active-interval { flex:none; color:var(--muted); font:11px ui-monospace,monospace; border-left:1px solid var(--border); padding-left:8px }
 #mode-badge { color:#f3bd71; border:1px solid #96601e; padding:3px 7px; border-radius:5px; font-size:10px; font-weight:750; letter-spacing:.06em; white-space:nowrap }
 .ohlc { min-height:25px; display:flex; align-items:center; gap:12px; padding:0 12px 5px; overflow:hidden; border-bottom:1px solid var(--border); color:var(--muted); font:11px ui-monospace,monospace; white-space:nowrap }
 .ohlc b { color:var(--text); font-weight:500 }
@@ -121,7 +122,7 @@ button:disabled:hover { background:transparent }
 }
 
 #feed-button { flex:1; min-width:0 }
-#help { min-height:38px; padding:0 10px; border:1px solid var(--border); border-radius:6px; color:var(--accent); font:650 12px system-ui,sans-serif; white-space:nowrap }
+#price-alert,#help { min-height:38px; padding:0 10px; border:1px solid var(--border); border-radius:6px; color:var(--accent); font:650 12px system-ui,sans-serif; white-space:nowrap }
 #help-dialog { width:min(94vw,620px); max-height:min(89dvh,820px) }
 #help-dialog[open] { display:flex; flex-direction:column; overflow:hidden }
 #help-dialog .dialog-heading { position:static; flex:none; gap:12px }
@@ -138,3 +139,10 @@ button:disabled:hover { background:transparent }
 .guide table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; text-align:left; line-height:1.45 }
 .guide th,.guide td { padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top }
 .guide th { color:var(--text) }
+
+#price-alert { display:inline-flex; align-items:center; text-decoration:none }
+#price-alert:hover { background:#ffffff0c }
+@media (max-width:540px) {
+  .status { gap:6px }
+  #price-alert,#help { padding:0 7px; font-size:11px }
+}

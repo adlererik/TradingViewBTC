@@ -25,6 +25,12 @@ The APK is signed for direct installation. It uses the same signing certificate 
 - **All plots** makes room for lines far from the current price. **Log** makes equal percentage moves take up equal vertical space. **Latest** jumps to the newest candle.
 - Tap the data-source status at the bottom to check the feeds or open a clearly labeled demo with simulated prices.
 
+## Price alerts on Android
+
+Tap **Price alert** (**Prislarm** in Swedish), enter a BTC/USD target, choose **At or below** or **At or above**, and tap **Arm alert**. A trade at the target or beyond it triggers one alarm notification with the Bitstamp trade price and time. Use the alert screen or the ongoing Android notification to cancel. You can edit or rearm the target in the app.
+
+The phone monitors Bitstamp directly while the screen is off. Enable app notifications and use **Battery settings** on the alert screen to exempt TradingViewBTC from battery optimization for deep sleep. This uses additional battery while armed. If the live connection drops, the app checks recent trades while it reconnects. A brief crossing can be missed during a longer network outage. After a force-stop or reboot, open the app and arm the alert again.
+
 ## Data and chart behavior
 
 Bitstamp supplies BTC/USD candles and trades. While the app is visible, new trades can update the price and current candle up to once per second. The app refreshes recent candles through the Bitstamp HTTP API about every 30 seconds and caches history locally. Mempool.space supplies network difficulty and estimated Bitcoin mining hash rate in place of the original Quandl feeds. The chart uses UTC. [Bitstamp API](https://www.bitstamp.net/api/) · [Bitstamp WebSocket](https://www.bitstamp.net/websocket/v2/) · [Mempool mining dashboard](https://mempool.space/mining)
@@ -43,7 +49,7 @@ The Pine edition shades the actual fourth halving date, April 20, 2024, and wait
 
 Open the repository in Android Studio and use **JDK 17**, **Android SDK 35**, and **Gradle 8.9**. Build the debug variant in Android Studio or run `gradle :app:assembleDebug` from the repository root. The output is `app/build/outputs/apk/debug/app-debug.apk`.
 
-On Linux, `tools/build-apk.sh` is an alternative that uses Android SDK platform 35, build-tools 35.0.0, a JDK and `zip`. Set `ANDROID_HOME` to your SDK directory. You can pass an output path as the first argument. Locally built APKs use your local signing key. [Android command-line build guide](https://developer.android.com/build/building-cmdline)
+On Linux, `tools/build-apk.sh` is an alternative that uses Android SDK platform 35, build-tools 35.0.0, a JDK, `zip`, `curl`, and `sha256sum`. Set `ANDROID_HOME` to your SDK directory. You can pass an output path as the first argument. Locally built APKs use your local signing key. [Android command-line build guide](https://developer.android.com/build/building-cmdline)
 
 ## Credits
 

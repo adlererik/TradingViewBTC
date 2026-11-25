@@ -49,6 +49,7 @@ function renderGuide() {
 
 function applyLanguage() {
   document.documentElement.lang = locale.language;
+  byId('price-alert').setAttribute('href','/price-alert?lang='+locale.language);
   for (const element of document.querySelectorAll('[data-text]')) element.textContent = t(element.dataset.text);
   for (const element of document.querySelectorAll('[data-label]')) element.setAttribute('aria-label',t(element.dataset.label));
   for (const element of document.querySelectorAll('[data-title]')) element.title = t(element.dataset.title);
